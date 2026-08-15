@@ -1,4 +1,7 @@
 {
+  "keep_vars": true
+}
+{
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"name": "astro-blog-film",
@@ -39,7 +42,7 @@
 
 	"vars": {
 		"SITE_NAME": "菲林小铺",
-		"SITE_URL": "https://blog.lkin.cn",
+		"SITE_URL": "https://film.lkin.cn",
 		"TURNSTILE_SITE_KEY": "0x4AAAAAACnxh79QQawnz9UI"
 	}
 
