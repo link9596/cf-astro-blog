@@ -7,6 +7,30 @@
 @import "lxgw-wenkai-webfont/lxgwwenkai-regular.css";
 @import "lxgw-wenkai-webfont/lxgwwenkai-bold.css";
 
+/* ⭐ Story 风格文章网格 */
+.post-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 24px;
+	padding: 0;
+	margin: 0;
+	list-style: none;
+}
+
+@media (max-width: 640px) {
+	.post-list {
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 16px;
+	}
+}
+
+@media (max-width: 480px) {
+	.post-list {
+		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+		gap: 12px;
+	}
+}
+
 :root {
 	--color-bg: #edf3f8;
 	--color-bg-secondary: rgba(255, 255, 255, 0.34);
