@@ -16,7 +16,7 @@
 
 	"d1_databases": [
 		{
-			"binding": "FILM_DB",
+			"binding": "DB",
 			"database_name": "film-db",
 			"database_id": "a05b87c2-0ba5-4294-95a6-8546fe0b0746",
 			"migrations_dir": "drizzle"
@@ -25,14 +25,14 @@
 
 	"r2_buckets": [
 		{
-			"binding": "FILM_MEDIA_BUCKET",
+			"binding": "MEDIA_BUCKET",
 			"bucket_name": "film-blog-media"
 		}
 	],
 
 	"kv_namespaces": [
 		{
-			"binding": "FILM_SESSION",
+			"binding": "SESSION",
 			"id": "2c273c2a2f174d3587cc90a4474d5db0"
 		}
 	],
