@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": "@astrojs/cloudflare/entrypoints/server",
-	"name": "cf-astro-blog",
+	"name": "astro-blog-film",
 	"compatibility_date": "2026-02-10",
 	"compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
 
@@ -16,30 +16,30 @@
 
 	"d1_databases": [
 		{
-			"binding": "DB",
-			"database_name": "blog",
-			"database_id": "30838030-7437-4cb6-b618-7eabe62144da",
+			"binding": "FILM_DB",
+			"database_name": "film-db",
+			"database_id": "a05b87c2-0ba5-4294-95a6-8546fe0b0746",
 			"migrations_dir": "drizzle"
 		}
 	],
 
 	"r2_buckets": [
 		{
-			"binding": "MEDIA_BUCKET",
-			"bucket_name": "blog-media"
+			"binding": "FILM_MEDIA_BUCKET",
+			"bucket_name": "film-blog-media"
 		}
 	],
 
 	"kv_namespaces": [
 		{
-			"binding": "SESSION",
+			"binding": "FILM_SESSION",
 			"id": "ee2c404dd676463d93bea249decdc0ac"
 		}
 	],
 
 	"vars": {
-		"SITE_NAME": "My Blog",
-		"SITE_URL": "https://blog.ericterminal.com",
+		"SITE_NAME": "菲林小铺",
+		"SITE_URL": "https://blog.lkin.cn",
 		"TURNSTILE_SITE_KEY": "0x4AAAAAACnxh79QQawnz9UI"
 	}
 

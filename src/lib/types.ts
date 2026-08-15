@@ -21,17 +21,17 @@ export interface CommentConfig {
 }
 
 export const siteConfig: SiteConfig = {
-	name: "Eric-Terminal 的博客",
-	url: "https://blog.ericterminal.com",
-	description: "记录 Cloudflare、前端工程、系统设计与长期有效的技术经验。",
-	author: "Eric",
+	name: "菲林小铺",
+	url: "https://film.lkin.cn",
+	description: "记录光影。",
+	author: "Link",
 	language: "zh-CN",
 	comments: {
 		provider: "giscus",
-		repo: "Eric-Terminal/cf-astro-blog",
-		repoId: "R_kgDORhlfAw",
-		category: "Announcements",
-		categoryId: "DIC_kwDORhlfA84C39BM",
+		repo: "link9596/cf-astro-blog",
+		repoId: "1334762404",
+		category: "Announcementsss",
+		categoryId: "DIC_kwDORhlfA84C39BMss",
 		mapping: "pathname",
 		strict: false,
 		reactionsEnabled: true,
