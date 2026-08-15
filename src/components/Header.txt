@@ -1,0 +1,241 @@
+---
+import { siteConfig } from "@/lib/types";
+import ThemeToggle from "./ThemeToggle.astro";
+---
+
+<header class="site-header">
+	<div class="container">
+		<div class="header-inner">
+			<!-- ⭐ Story 标题：F I L M s -->
+			<div class="logo">
+				<span class="letter">F</span>
+				<span class="letter">I</span>
+				<a href="/" class="brand-link">
+					<span class="letter brand-letter">L</span>
+				</a>
+				<span class="letter">M</span>
+				<span class="letter">s</span>
+				<span class="header-subtitle">📷 Link's Color.</span>
+			</div>
+
+			<!-- ⭐ 右侧导航按钮 -->
+			<div class="nav-buttons">
+				<a href="javascript:void(0)" id="menuPageBtn" class="nav-btn" title="页面菜单">
+					<span class="nav-icon">≡</span>
+				</a>
+				<a href="javascript:void(0)" id="menuTreeBtn" class="nav-btn" title="目录树">
+					<span class="nav-icon">🌳</span>
+				</a>
+				<a href="javascript:void(0)" id="menuSearchBtn" class="nav-btn" title="搜索">
+					<span class="nav-icon">🔍</span>
+				</a>
+				<ThemeToggle />
+			</div>
+		</div>
+
+		<!-- ⭐ 页面菜单（独立页面列表） -->
+		<div id="menuPage" class="menu-dropdown" style="display:none;">
+			<!-- 由 JS 动态填充，或硬编码 -->
+			<a href="/blog">归档</a>
+			<a href="/about">关于</a>
+			<!-- 更多页面... -->
+		</div>
+
+		<!-- ⭐ 搜索框 -->
+		<div id="menuSearch" class="search-dropdown" style="display:none;">
+			<form action="/search" method="get" role="search">
+				<input type="text" name="q" placeholder="搜索~" autocomplete="off" />
+			</form>
+		</div>
+	</div>
+</header>
+
+<!-- ⭐ Story 风格交互脚本 -->
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function() {
+		const menuPageBtn = document.getElementById('menuPageBtn');
+		const menuTreeBtn = document.getElementById('menuTreeBtn');
+		const menuSearchBtn = document.getElementById('menuSearchBtn');
+		const menuPage = document.getElementById('menuPage');
+		const menuSearch = document.getElementById('menuSearch');
+
+		// 页面菜单切换
+		menuPageBtn?.addEventListener('click', function(e) {
+			e.preventDefault();
+			menuPage.style.display = menuPage.style.display === 'block' ? 'none' : 'block';
+			menuSearch.style.display = 'none';
+		});
+
+		// 目录树按钮（在文章页触发，由 Post.astro 处理）
+		menuTreeBtn?.addEventListener('click', function(e) {
+			e.preventDefault();
+			const tocToggle = document.getElementById('storyTocToggle');
+			if (tocToggle) {
+				tocToggle.click();
+			} else {
+				alert('📑 目录树只在文章页面可用哦');
+			}
+		});
+
+		// 搜索切换
+		menuSearchBtn?.addEventListener('click', function(e) {
+			e.preventDefault();
+			menuSearch.style.display = menuSearch.style.display === 'block' ? 'none' : 'block';
+			menuPage.style.display = 'none';
+			if (menuSearch.style.display === 'block') {
+				menuSearch.querySelector('input')?.focus();
+			}
+		});
+
+		// 点击外部关闭下拉
+		document.addEventListener('click', function(e) {
+			if (!e.target.closest('.nav-buttons') && !e.target.closest('.menu-dropdown') && !e.target.closest('.search-dropdown')) {
+				menuPage.style.display = 'none';
+				menuSearch.style.display = 'none';
+			}
+		});
+	});
+</script>
+
+<style>
+	.site-header {
+		padding: 1.2rem 0;
+		background: #ffffff;
+		border-bottom: 1px solid #eaeef3;
+	}
+
+	.header-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+	}
+
+	.logo {
+		display: flex;
+		align-items: center;
+		gap: 0.15rem;
+		font-size: 1.8rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		font-family: 'Georgia', serif;
+	}
+
+	.letter {
+		color: #2c3e50;
+		transition: color 0.2s;
+	}
+
+	.brand-link {
+		text-decoration: none;
+	}
+
+	.brand-letter {
+		color: #3498db;
+	}
+
+	.letter:hover {
+		color: #3498db;
+	}
+
+	.header-subtitle {
+		margin-left: 0.75rem;
+		font-size: 0.85rem;
+		font-weight: 400;
+		color: #999;
+		letter-spacing: 0.02em;
+	}
+
+	.nav-buttons {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.nav-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.4rem 0.6rem;
+		border-radius: 6px;
+		color: #888;
+		text-decoration: none;
+		font-size: 1.1rem;
+		transition: color 0.2s, background 0.2s;
+		cursor: pointer;
+	}
+
+	.nav-btn:hover {
+		color: #3498db;
+		background: #f0f2f4;
+	}
+
+	.nav-icon {
+		line-height: 1;
+	}
+
+	/* 下拉菜单 */
+	.menu-dropdown,
+	.search-dropdown {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		margin-top: 0.5rem;
+		min-width: 160px;
+		background: #ffffff;
+		border: 1px solid #eaeef3;
+		border-radius: 8px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+		padding: 0.5rem 0;
+		z-index: 100;
+	}
+
+	.menu-dropdown a {
+		display: block;
+		padding: 0.5rem 1.2rem;
+		color: #2c3e50;
+		text-decoration: none;
+		font-size: 0.92rem;
+		transition: background 0.2s, color 0.2s;
+	}
+
+	.menu-dropdown a:hover {
+		background: #f0f2f4;
+		color: #3498db;
+	}
+
+	.search-dropdown {
+		min-width: 220px;
+		padding: 0.8rem 1rem;
+	}
+
+	.search-dropdown input {
+		width: 100%;
+		padding: 0.5rem 0.8rem;
+		border: 1px solid #eaeef3;
+		border-radius: 6px;
+		font-size: 0.92rem;
+		outline: none;
+		transition: border-color 0.2s;
+	}
+
+	.search-dropdown input:focus {
+		border-color: #3498db;
+	}
+
+	/* 响应式 */
+	@media (max-width: 640px) {
+		.logo {
+			font-size: 1.4rem;
+		}
+		.header-subtitle {
+			font-size: 0.75rem;
+			margin-left: 0.4rem;
+		}
+		.nav-btn {
+			padding: 0.3rem 0.4rem;
+			font-size: 1rem;
+		}
+	}
+</style>

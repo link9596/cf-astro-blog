@@ -37,7 +37,6 @@ function clampInteger(
 	if (typeof value !== "number" || Number.isNaN(value)) {
 		return fallback;
 	}
-
 	return Math.min(max, Math.max(min, Math.round(value)));
 }
 
@@ -96,7 +95,8 @@ const backgroundImageUrl = buildBackgroundImageUrl(resolvedBackgroundImageKey);
 const backgroundImageStyle = backgroundImageUrl
 	? `--bg-focus-x: ${resolvedBackgroundPositionX}; --bg-focus-y: ${resolvedBackgroundPositionY}; --bg-blur: ${resolvedBackgroundBlur}px; --bg-scale: ${resolvedBackgroundScale / 100}; --bg-opacity: ${resolvedBackgroundOpacity / 100};`
 	: "";
-const surfaceStyle = `--hero-card-opacity: ${siteAppearance.heroCardOpacity}; --hero-card-blur: ${siteAppearance.heroCardBlur}px; --post-card-opacity: ${siteAppearance.postCardOpacity}; --post-card-blur: ${siteAppearance.postCardBlur}px; --article-panel-opacity: ${siteAppearance.articlePanelOpacity}; --article-panel-blur: ${siteAppearance.articlePanelBlur}px;`;
+// ⭐ 修改：Story 主题不使用毛玻璃透明度，重置为不透明
+const surfaceStyle = `--hero-card-opacity: 1; --hero-card-blur: 0px; --post-card-opacity: 1; --post-card-blur: 0px; --article-panel-opacity: 1; --article-panel-blur: 0px;`;
 const resolvedDescription =
 	description ??
 	resolveSiteDescriptionFromAppearance(siteAppearance, siteConfig.description);
@@ -121,25 +121,17 @@ const resolvedDescription =
 		{!isAdminPreview && <script is:inline src="/home-motion.js"></script>}
 		{!isAdminPreview && <script is:inline src="/footer-reveal.js"></script>}
 	</head>
-		<body
-			class:list={[
-				"site-shell",
-				{ "site-shell-has-background-image": Boolean(backgroundImageUrl) },
-			]}
-			style={surfaceStyle}
-		>
-		<div class="site-background" aria-hidden="true">
-			{backgroundImageUrl && (
-				<img
-					src={backgroundImageUrl}
-					alt=""
-					class="site-background-image"
-					style={backgroundImageStyle}
-					loading="eager"
-					decoding="async"
-				/>
-			)}
-		</div>
+	<body
+		class:list={[
+			"site-shell",
+			// ⭐ 修改：不启用背景图（Story 风格纯白背景）
+			// { "site-shell-has-background-image": Boolean(backgroundImageUrl) },
+		]}
+		style={surfaceStyle}
+	>
+		<!-- ⭐ 修改：移除背景图层，Story 不需要 -->
+		<!-- <div class="site-background" aria-hidden="true"> ... </div> -->
+		
 		<Header siteAppearance={siteAppearance} />
 		<div class="site-route-frame">
 			<main class="container site-main">
@@ -149,3 +141,30 @@ const resolvedDescription =
 		</div>
 	</body>
 </html>
+
+<!-- ⭐ 新增：覆盖 cf-astro-blog 的毛玻璃样式，改为 Story 的纯白卡片风格 -->
+<style is:global>
+	/* 重置 glass-panel 为纯白卡片 */
+	.glass-panel {
+		background: #ffffff !important;
+		border: 1px solid #eaeef3 !important;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+		backdrop-filter: none !important;
+		-webkit-backdrop-filter: none !important;
+	}
+	.glass-panel::before,
+	.glass-panel::after {
+		display: none !important;
+	}
+	/* 重置 body 背景为白色 */
+	body {
+		background: #f8f9fa !important;
+	}
+	.site-shell {
+		background: #f8f9fa !important;
+	}
+	/* 容器宽度适配 Story 风格 */
+	.container {
+		max-width: 1140px;
+	}
+</style>

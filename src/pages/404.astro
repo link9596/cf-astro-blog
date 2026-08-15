@@ -6,145 +6,245 @@ const missingPath = Astro.url.pathname || "/";
 ---
 
 <Base title="404 - 页面不存在" description="页面不存在，不过你可以试试这个终端彩蛋。">
-	<section
-		class="not-found-terminal glass-panel"
-		data-not-found-terminal="true"
-		data-ai-endpoint="/api/ai/terminal-404"
-		data-missing-path={missingPath}
-	>
-		<header class="terminal-header">
-			<span class="terminal-dot terminal-dot-danger"></span>
-			<span class="terminal-dot terminal-dot-warn"></span>
-			<span class="terminal-dot terminal-dot-ok"></span>
-			<strong class="terminal-title">404-terminal://not-found</strong>
-		</header>
-
-		<div class="terminal-log" data-terminal-log="true" role="log" aria-live="polite">
-			<p class="terminal-line terminal-line-system">[404] 未找到路径：{missingPath}</p>
-			<p class="terminal-line terminal-line-system">欢迎来到彩蛋终端，输入命令后将由外接 AI 返回终端风格结果。</p>
-			<p class="terminal-line terminal-line-system">可先试试：help、whoami、ls、pwd、about</p>
+	<!-- ⭐ Story 风格：简洁的 404 提示 + 终端 -->
+	<section class="not-found-wrapper">
+		<!-- 404 标题区域 -->
+		<div class="not-found-header">
+			<h1 class="not-found-title">404</h1>
+			<p class="not-found-subtitle">不知道发生了什么...</p>
+			<p class="not-found-emoji">(,,• ₃ •,,)</p>
 		</div>
 
-		<form class="terminal-form" data-terminal-form="true">
-			<label class="terminal-input-wrap" for="terminalCommandInput">
-				<span class="terminal-prompt">guest@404:~$</span>
-				<input
-					id="terminalCommandInput"
-					class="terminal-input"
-					name="command"
-					type="text"
-					placeholder="输入命令并回车"
-					autocomplete="off"
-					spellcheck="false"
-					data-terminal-input="true"
-					maxlength="200"
-					required
-				/>
-			</label>
-			<button type="submit" class="terminal-submit">执行</button>
-		</form>
+		<!-- 快捷导航卡片（Story 风格） -->
+		<div class="not-found-actions">
+			<a href="/search" class="action-card">
+				<h3>🔍 搜索一下</h3>
+				<span class="action-hint">(•̀ᴗ•́)و ̑̑</span>
+			</a>
+			<a href="/" class="action-card">
+				<h3>🏠 返回首页</h3>
+				<span class="action-hint">(・(ｪ)・)</span>
+			</a>
+			<a href="/blog" class="action-card">
+				<h3>📖 查看归档</h3>
+				<span class="action-hint">(○’ω’○)</span>
+			</a>
+		</div>
+
+		<!-- ⭐ 终端彩蛋（保留功能，更换样式） -->
+		<div
+			class="not-found-terminal"
+			data-not-found-terminal="true"
+			data-ai-endpoint="/api/ai/terminal-404"
+			data-missing-path={missingPath}
+		>
+			<header class="terminal-header">
+				<span class="terminal-dot terminal-dot-danger"></span>
+				<span class="terminal-dot terminal-dot-warn"></span>
+				<span class="terminal-dot terminal-dot-ok"></span>
+				<strong class="terminal-title">💻 终端彩蛋</strong>
+			</header>
+
+			<div class="terminal-log" data-terminal-log="true" role="log" aria-live="polite">
+				<p class="terminal-line terminal-line-system">[404] 未找到路径：{missingPath}</p>
+				<p class="terminal-line terminal-line-system">欢迎来到彩蛋终端 👋</p>
+				<p class="terminal-line terminal-line-system">试试这些命令：help、whoami、ls、pwd、about</p>
+			</div>
+
+			<form class="terminal-form" data-terminal-form="true">
+				<label class="terminal-input-wrap" for="terminalCommandInput">
+					<span class="terminal-prompt">$</span>
+					<input
+						id="terminalCommandInput"
+						class="terminal-input"
+						name="command"
+						type="text"
+						placeholder="输入命令并回车..."
+						autocomplete="off"
+						spellcheck="false"
+						data-terminal-input="true"
+						maxlength="200"
+						required
+					/>
+				</label>
+				<button type="submit" class="terminal-submit">执行</button>
+			</form>
+		</div>
 	</section>
+
 	<script is:inline src="/not-found-terminal.js"></script>
 </Base>
 
 <style>
+	/* ⭐ Story 风格 404 页面 */
+	.not-found-wrapper {
+		max-width: 680px;
+		margin: 0 auto;
+		padding: 2rem 0;
+	}
+
+	/* 标题区域 */
+	.not-found-header {
+		text-align: center;
+		padding: 2rem 0 1.5rem;
+	}
+
+	.not-found-title {
+		font-size: 5rem;
+		font-weight: 700;
+		color: #1a1a1a;
+		margin: 0;
+		line-height: 1;
+		letter-spacing: -0.04em;
+	}
+
+	.not-found-subtitle {
+		font-size: 1.2rem;
+		color: #666;
+		margin: 0.5rem 0 0.2rem;
+	}
+
+	.not-found-emoji {
+		font-size: 1.5rem;
+		color: #999;
+		margin: 0;
+	}
+
+	/* 快捷操作卡片（Story 网格风格） */
+	.not-found-actions {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1rem;
+		margin: 1.5rem 0 2.5rem;
+	}
+
+	.action-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 1.2rem 0.8rem;
+		background: #fafbfc;
+		border: 1px solid #eaeef3;
+		border-radius: 8px;
+		text-decoration: none;
+		transition: border-color 0.2s, background 0.2s, transform 0.2s;
+		text-align: center;
+	}
+
+	.action-card:hover {
+		border-color: #3498db;
+		background: #f0f7fc;
+		transform: translateY(-2px);
+	}
+
+	.action-card h3 {
+		font-size: 1rem;
+		font-weight: 600;
+		color: #2c3e50;
+		margin: 0 0 0.2rem;
+	}
+
+	.action-hint {
+		font-size: 0.85rem;
+		color: #999;
+	}
+
+	/* ⭐ 终端（去除毛玻璃，改为纯白卡片） */
 	.not-found-terminal {
 		display: grid;
-		gap: 0.9rem;
-		padding: clamp(1rem, 0.8rem + 1vw, 1.6rem);
-		margin-bottom: 1.25rem;
-		border: 1px solid rgba(96, 165, 250, 0.25);
-		/* 透明度/模糊跟随后台「卡片」控制，与 friends / search 页面 glass-panel 保持一致 */
-		--glass-panel-opacity: calc(var(--hero-card-opacity, 14) / 100);
-		--glass-panel-blur: var(--hero-card-blur, 18px);
-		/* 终端语义色（深色模式默认值） */
-		--terminal-cmd-color: #a7f3d0;
-		--terminal-error-color: #fca5a5;
-		--terminal-prompt-color: #86efac;
-	}
-
-	/* 浅色主题：终端语义色切换为深色可读版本 */
-	:root[data-theme="light"] .not-found-terminal {
-		--terminal-cmd-color: #047857;
+		gap: 0.8rem;
+		padding: 1.2rem 1.4rem;
+		border: 1px solid #eaeef3;
+		border-radius: 8px;
+		background: #ffffff;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+		/* 终端文字颜色（浅色主题） */
+		--terminal-cmd-color: #16a34a;
 		--terminal-error-color: #dc2626;
 		--terminal-prompt-color: #16a34a;
-	}
-
-	@media (prefers-color-scheme: light) {
-		:root:not([data-theme="dark"]) .not-found-terminal {
-			--terminal-cmd-color: #047857;
-			--terminal-error-color: #dc2626;
-			--terminal-prompt-color: #16a34a;
-		}
 	}
 
 	.terminal-header {
 		display: flex;
 		align-items: center;
-		gap: 0.45rem;
-		padding-bottom: 0.55rem;
-		border-bottom: 1px solid var(--color-border);
+		gap: 0.4rem;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid #eaeef3;
 	}
 
 	.terminal-dot {
-		width: 0.62rem;
-		height: 0.62rem;
-		border-radius: 999px;
+		width: 0.6rem;
+		height: 0.6rem;
+		border-radius: 50%;
 	}
 
 	.terminal-dot-danger {
 		background: #ff5f56;
 	}
-
 	.terminal-dot-warn {
 		background: #ffbd2e;
 	}
-
 	.terminal-dot-ok {
 		background: #27c93f;
 	}
 
 	.terminal-title {
-		margin-left: 0.35rem;
+		margin-left: 0.3rem;
 		font-size: 0.8rem;
-		color: var(--color-text-secondary);
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+		color: #999;
+		font-weight: 500;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	}
 
 	.terminal-log {
-		min-height: 300px;
-		max-height: min(56vh, 520px);
+		min-height: 200px;
+		max-height: 320px;
 		overflow: auto;
 		padding: 0.2rem 0.1rem;
 		display: grid;
-		gap: 0.32rem;
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-		font-size: 0.88rem;
-		line-height: 1.48;
+		gap: 0.25rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+
+	/* 自定义滚动条 */
+	.terminal-log::-webkit-scrollbar {
+		width: 4px;
+	}
+	.terminal-log::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.terminal-log::-webkit-scrollbar-thumb {
+		background: #d0d5da;
+		border-radius: 4px;
 	}
 
 	.terminal-line {
 		margin: 0;
 		white-space: pre-wrap;
 		word-break: break-word;
-		color: var(--color-text);
+		color: #2c3e50;
 	}
 
 	.terminal-line-command {
 		color: var(--terminal-cmd-color);
+		font-weight: 500;
 	}
 
 	.terminal-line-system {
-		color: var(--color-text-muted);
+		color: #888;
 	}
 
 	.terminal-line-error {
 		color: var(--terminal-error-color);
 	}
 
+	/* 终端输入行 */
 	.terminal-form {
 		display: flex;
-		gap: 0.62rem;
+		gap: 0.6rem;
 		align-items: center;
 	}
 
@@ -154,17 +254,23 @@ const missingPath = Astro.url.pathname || "/";
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		padding: 0.62rem 0.72rem;
-		border: 1px solid var(--color-border);
-		border-radius: 12px;
-		background: var(--color-bg-tertiary);
+		padding: 0.5rem 0.7rem;
+		border: 1px solid #eaeef3;
+		border-radius: 6px;
+		background: #fafbfc;
+		transition: border-color 0.2s;
+	}
+
+	.terminal-input-wrap:focus-within {
+		border-color: #3498db;
 	}
 
 	.terminal-prompt {
-		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
-		font-size: 0.84rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 0.8rem;
 		color: var(--terminal-prompt-color);
 		white-space: nowrap;
+		font-weight: 600;
 	}
 
 	.terminal-input {
@@ -172,30 +278,53 @@ const missingPath = Astro.url.pathname || "/";
 		min-width: 0;
 		border: none;
 		outline: none;
-		color: var(--color-text);
+		color: #2c3e50;
 		background: transparent;
 		font: inherit;
+		font-size: 0.85rem;
 	}
 
 	.terminal-input::placeholder {
-		color: var(--color-text-placeholder);
+		color: #bbb;
 	}
 
 	.terminal-submit {
-		border: 1px solid rgba(96, 165, 250, 0.35);
-		background: linear-gradient(120deg, rgba(30, 64, 175, 0.55), rgba(37, 99, 235, 0.36));
-		color: rgba(239, 246, 255, 0.96);
-		padding: 0.6rem 0.85rem;
-		border-radius: 12px;
-		font-size: 0.82rem;
+		padding: 0.5rem 1.2rem;
+		border: none;
+		border-radius: 6px;
+		background: #3498db;
+		color: #ffffff;
+		font-size: 0.85rem;
 		cursor: pointer;
+		transition: background 0.2s;
+		font-family: inherit;
 	}
 
 	.terminal-submit:hover {
-		border-color: rgba(147, 197, 253, 0.58);
+		background: #2980b9;
 	}
 
+	/* ⭐ 响应式 */
 	@media (max-width: 640px) {
+		.not-found-actions {
+			grid-template-columns: 1fr;
+			gap: 0.6rem;
+		}
+
+		.not-found-title {
+			font-size: 3.5rem;
+		}
+
+		.not-found-terminal {
+			padding: 0.8rem 1rem;
+		}
+
+		.terminal-log {
+			min-height: 150px;
+			max-height: 220px;
+			font-size: 0.8rem;
+		}
+
 		.terminal-form {
 			flex-direction: column;
 			align-items: stretch;
@@ -203,6 +332,15 @@ const missingPath = Astro.url.pathname || "/";
 
 		.terminal-submit {
 			width: 100%;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.terminal-input-wrap {
+			padding: 0.4rem 0.6rem;
+		}
+		.terminal-input {
+			font-size: 0.8rem;
 		}
 	}
 </style>

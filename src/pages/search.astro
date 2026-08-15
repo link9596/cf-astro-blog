@@ -1,6 +1,5 @@
 ---
 import { env } from "cloudflare:workers";
-import "@/styles/post-card.css";
 import SearchBox from "@/components/Search.astro";
 import { blogCategories, blogTags } from "@/db/schema";
 import Base from "@/layouts/Base.astro";
@@ -11,17 +10,14 @@ function normalizeDateInput(value: string | null) {
 	if (!value) {
 		return "";
 	}
-
 	const normalized = value.trim();
 	if (!/^\d{4}-\d{2}-\d{2}$/u.test(normalized)) {
 		return "";
 	}
-
 	const parsed = new Date(`${normalized}T00:00:00`);
 	if (Number.isNaN(parsed.getTime())) {
 		return "";
 	}
-
 	const [year, month, day] = normalized.split("-").map((item) => Number(item));
 	if (
 		parsed.getFullYear() !== year ||
@@ -30,7 +26,6 @@ function normalizeDateInput(value: string | null) {
 	) {
 		return "";
 	}
-
 	return normalized;
 }
 
@@ -74,7 +69,6 @@ try {
 			.from(blogTags)
 			.orderBy(blogTags.name),
 	]);
-
 	categories = allCategories;
 	tags = allTags;
 } catch {
@@ -92,163 +86,125 @@ const activeFilters = [
 ---
 
 <Base title="搜索" description="使用 Pagefind 在浏览器本地检索文章内容">
-	<section
-		class="search-hero search-hero-depth glass-panel"
-		data-tilt-card
-		data-tilt-scale="0.42"
-		data-tilt-shift-scale="0.72"
-	>
-		<span class="section-kicker">站内检索</span>
-		<h1 class="page-title">搜索</h1>
-		<p class="page-intro">
-			本页搜索由 Pagefind 在浏览器内执行，不依赖服务端检索 API。
+	<!-- ⭐ Story 风格：简洁的搜索页面 -->
+	<section class="search-header">
+		<h1 class="page-title">🔍 搜索</h1>
+		<p class="page-description">
+			在浏览器本地搜索文章内容，支持关键词、分类、标签和时间筛选
 		</p>
-		<div class="search-entry-stage" transition:name="search-entry">
-			<SearchBox
-				initialQuery={query}
-				categories={categories}
-				tags={tags}
-				selectedCategory={selectedCategory}
-				selectedTags={selectedTags}
-				selectedDateFrom={selectedDateFrom}
-				selectedDateTo={selectedDateTo}
-			/>
-		</div>
 	</section>
 
-	<section class="search-results-block" id="search-results-section" style={hasSearchCriteria ? undefined : "display:none"}>
-		<div class="section-head">
-			<div>
-				<h2 class="section-heading">搜索结果</h2>
-				<p class="section-subheading">
-					{activeFilters.length > 0 ? activeFilters.join(" · ") : "输入关键词后开始检索"}
+	<!-- ⭐ 搜索框区域（SearchBox 组件，已适配 Story 样式） -->
+	<div class="search-box-wrapper">
+		<SearchBox
+			initialQuery={query}
+			categories={categories}
+			tags={tags}
+			selectedCategory={selectedCategory}
+			selectedTags={selectedTags}
+			selectedDateFrom={selectedDateFrom}
+			selectedDateTo={selectedDateTo}
+		/>
+	</div>
+
+	<!-- ⭐ 搜索结果 -->
+	<section
+		class="search-results-block"
+		id="search-results-section"
+		style={hasSearchCriteria ? undefined : "display:none"}
+	>
+		<div class="results-header">
+			<h2 class="results-title">📄 搜索结果</h2>
+			{activeFilters.length > 0 && (
+				<p class="results-filters">
+					{activeFilters.join(" · ")}
 				</p>
-			</div>
+			)}
 			<p id="pagefind-results-summary" class="results-summary">
 				{hasSearchCriteria ? "正在加载搜索结果..." : "输入关键词或筛选条件后开始搜索"}
 			</p>
 		</div>
-		<div id="pagefind-search-results" class="search-grid" />
+		<div id="pagefind-search-results" class="results-grid" />
 	</section>
 
 	<script is:inline type="module" src="/pagefind-search.js"></script>
 </Base>
 
 <style>
-	.search-hero {
-		--glass-panel-opacity: calc(var(--hero-card-opacity, 14) / 100);
-		--glass-panel-blur: var(--hero-card-blur, 18px);
-		display: grid;
-		gap: 1rem;
-		padding: clamp(1.5rem, 1rem + 2vw, 2.6rem);
+	/* ⭐ Story 风格：简洁干净 */
+	.search-header {
+		padding: 1.5rem 0 1.2rem;
+		border-bottom: 1px solid #eaeef3;
+		margin-bottom: 1.8rem;
 	}
 
-	.search-hero-depth {
-		position: relative;
-		overflow: hidden;
-		transform:
-			perspective(1200px)
-			rotateX(var(--tilt-rotate-x, 0deg))
-			rotateY(var(--tilt-rotate-y, 0deg))
-			scale3d(1.002, 1.002, 1.002);
-		transform-style: preserve-3d;
-		transition:
-			transform var(--nav-motion-surface),
-			box-shadow var(--nav-motion-surface);
+	.page-title {
+		font-size: 2rem;
+		font-weight: 700;
+		color: #1a1a1a;
+		margin: 0 0 0.3rem;
 	}
 
-	.search-hero-depth::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		border-radius: inherit;
-		background:
-			radial-gradient(
-				circle at 18% 24%,
-				rgba(10, 132, 255, 0.22),
-				transparent 38%
-			),
-			linear-gradient(
-				135deg,
-				rgba(255, 255, 255, 0.16),
-				rgba(255, 255, 255, 0.02) 58%,
-				transparent
-			);
-		opacity: 0.72;
-		pointer-events: none;
-		transform: translate3d(
-			calc(var(--tilt-shift-x, 0) * -8px),
-			calc(var(--tilt-shift-y, 0) * -8px),
-			0
-		);
-		transition: transform var(--nav-motion-surface);
+	.page-description {
+		font-size: 1rem;
+		color: #888;
+		margin: 0;
+		line-height: 1.6;
 	}
 
-	.search-hero-depth .section-kicker,
-	.search-hero-depth .page-title,
-	.search-hero-depth .page-intro {
-		position: relative;
-		z-index: 1;
-		transform: translate3d(
-			calc(var(--tilt-shift-x, 0) * 2px),
-			calc(var(--tilt-shift-y, 0) * 2px),
-			14px
-		);
-		transition: transform var(--nav-motion-surface);
+	/* 搜索框容器 */
+	.search-box-wrapper {
+		margin-bottom: 2rem;
 	}
 
+	/* 搜索结果 */
 	.search-results-block {
 		display: grid;
-		gap: 1.2rem;
-	}
-
-	.search-entry-stage {
-		width: 100%;
-	}
-
-	.search-hero-depth .search-entry-stage {
-		position: relative;
-		z-index: 1;
-		transform: translate3d(
-			calc(var(--tilt-shift-x, 0) * 4px),
-			calc(var(--tilt-shift-y, 0) * 4px),
-			24px
-		);
-		transition: transform var(--nav-motion-surface);
-	}
-
-	.section-head {
-		display: flex;
-		align-items: end;
-		justify-content: space-between;
 		gap: 1rem;
+	}
+
+	.results-header {
+		padding: 0.8rem 0 0.4rem;
+		border-top: 1px solid #eaeef3;
+	}
+
+	.results-title {
+		font-size: 1.2rem;
+		font-weight: 600;
+		color: #2c3e50;
+		margin: 0 0 0.2rem;
+	}
+
+	.results-filters {
+		font-size: 0.9rem;
+		color: #888;
+		margin: 0 0 0.2rem;
 	}
 
 	.results-summary {
-		color: var(--color-text-muted);
-		font-size: 0.92rem;
+		font-size: 0.9rem;
+		color: #aaa;
+		margin: 0;
 	}
 
-	.search-grid {
+	.results-grid {
 		display: grid;
 		gap: 1rem;
 	}
 
-	@media (max-width: 840px) {
-		.section-head {
-			flex-direction: column;
-			align-items: start;
+	/* ⭐ 响应式 */
+	@media (max-width: 640px) {
+		.search-header {
+			padding: 1rem 0 0.8rem;
 		}
-	}
-
-	@media (hover: none), (pointer: coarse) {
-		.search-hero-depth,
-		.search-hero-depth::before,
-		.search-hero-depth .section-kicker,
-		.search-hero-depth .page-title,
-		.search-hero-depth .page-intro,
-		.search-hero-depth .search-entry-stage {
-			transform: none;
+		.page-title {
+			font-size: 1.6rem;
+		}
+		.page-description {
+			font-size: 0.9rem;
+		}
+		.results-title {
+			font-size: 1rem;
 		}
 	}
 </style>

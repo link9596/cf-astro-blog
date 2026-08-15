@@ -1,0 +1,53 @@
+---
+import { siteConfig } from "@/lib/types";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+	<div class="container">
+		<div class="footer-inner">
+			<p class="footer-copy">
+				&copy; {year} <a href="/">{siteConfig.name}</a> · 記錄光&影
+				<br />
+				<a
+					href="https://icp.gov.moe/?keyword=20260806"
+					target="_blank"
+					rel="noopener noreferrer"
+					style="font-size:12px;"
+				>
+					萌ICP备20260806号
+				</a>
+			</p>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		padding: 2.5rem 0 3rem;
+		margin-top: 2rem;
+		background: #ffffff;
+		border-top: 1px solid #eaeef3;
+	}
+
+	.footer-inner {
+		text-align: center;
+	}
+
+	.footer-copy {
+		font-size: 0.92rem;
+		color: #999;
+		line-height: 1.8;
+	}
+
+	.footer-copy a {
+		color: #888;
+		text-decoration: none;
+		transition: color 0.2s;
+	}
+
+	.footer-copy a:hover {
+		color: #3498db;
+	}
+</style>
