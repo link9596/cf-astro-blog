@@ -23,9 +23,6 @@ interface HomePostCardRow {
 	categoryName: string | null;
 	featuredImageKey: string | null;
 	featuredImageAlt: string | null;
-	cjkCharCount: number;
-	latinWordCount: number;
-	estimatedReadingMinutes: number;
 }
 
 let pinnedPosts: HomePostCardRow[] = [];
@@ -44,7 +41,6 @@ function toHomePostCardRow(row: {
 	featuredImageAlt: string | null;
 }): HomePostCardRow {
 	const readingStats = estimateArticleReadStats(row.content);
-
 	return {
 		title: row.title,
 		slug: row.slug,
@@ -54,9 +50,6 @@ function toHomePostCardRow(row: {
 		categoryName: row.categoryName,
 		featuredImageKey: row.featuredImageKey,
 		featuredImageAlt: row.featuredImageAlt,
-		cjkCharCount: readingStats.cjkCharCount,
-		latinWordCount: readingStats.latinWordCount,
-		estimatedReadingMinutes: readingStats.estimatedReadingMinutes,
 	};
 }
 
@@ -107,190 +100,57 @@ try {
 			and(getPublicPostVisibilityCondition(), eq(blogPosts.isPinned, false)),
 		)
 		.orderBy(desc(blogPosts.publishedAt), desc(blogPosts.createdAt))
-		.limit(6);
+		.limit(10);
 	recentPosts = recentRows.map(toHomePostCardRow);
 } catch {
 	// D1 未绑定时首页退化为空列表
 }
 
-const homepageMetaDescription = resolveSiteDescriptionFromAppearance(
-	homepageAppearance,
-	siteConfig.description,
-);
-
-// ⭐ 合并所有文章用于展示（置顶优先）
 const allPosts = [...pinnedPosts, ...recentPosts];
 const hasPosts = allPosts.length > 0;
 ---
 
-<Base title={siteConfig.name} description={homepageMetaDescription}>
-	<!-- ⭐ Story 风格：简洁的首页头部 -->
-	<section class="home-header">
-		<h1 class="site-title">{siteConfig.name}</h1>
-		<p class="site-description">{homepageMetaDescription}</p>
-		<div class="header-actions">
-			<a href="/blog" class="btn-primary">📖 浏览归档</a>
-			<a href="/search" class="btn-secondary">🔍 搜索文章</a>
+<Base title={siteConfig.name} description={siteConfig.description}>
+	<!-- ⭐ 直接使用 Story 的 HTML 结构，容器用 container-fluid -->
+	<div class="container-fluid">
+		<div class="row">
+			<div id="main" role="main">
+				<ul class="post-list clearfix">
+					{hasPosts ? (
+						allPosts.map((post) => (
+							<PostCard
+								title={post.title}
+								slug={post.slug}
+								excerpt={post.excerpt}
+								publishedAt={post.publishedAt}
+								authorName={post.authorName}
+								categoryName={post.categoryName}
+								featuredImageKey={post.featuredImageKey}
+								featuredImageAlt={post.featuredImageAlt}
+							/>
+						))
+					) : (
+						<li class="post-item grid-item">
+							<a class="post-link">
+								<h3 class="post-title">还没有文章<br />去后台发布吧</h3>
+							</a>
+						</li>
+					)}
+				</ul>
+			</div>
 		</div>
-	</section>
+	</div>
 
-	<!-- ⭐ 文章列表 -->
-	{hasPosts ? (
-		<div class="home-grid">
-			{allPosts.map((post, index) => (
-				<PostCard
-					title={post.title}
-					slug={post.slug}
-					excerpt={post.excerpt}
-					publishedAt={post.publishedAt}
-					authorName={post.authorName}
-					categoryName={post.categoryName}
-					featuredImageKey={post.featuredImageKey}
-					featuredImageAlt={post.featuredImageAlt}
-					cjkCharCount={post.cjkCharCount}
-					latinWordCount={post.latinWordCount}
-					estimatedReadingMinutes={post.estimatedReadingMinutes}
-					coverSide={index % 2 === 0 ? "left" : "right"}
-				/>
-			))}
+	<!-- ⭐ 分页 -->
+	<div class="container-fluid">
+		<div class="row">
+			<div class="nav-page">
+				<ol class="page-navigator">
+					<li class="current"><a href="/">1</a></li>
+					<li><a href="/page/2">2</a></li>
+					<li><a href="/page/3">3</a></li>
+				</ol>
+			</div>
 		</div>
-	) : (
-		<div class="empty-state">
-			<p>📭 还没有已发布文章，去后台发布第一篇吧。</p>
-		</div>
-	)}
-
-	<!-- ⭐ 底部：查看更多 -->
-	{hasPosts && (
-		<div class="view-all">
-			<a href="/blog" class="btn-primary">查看全部文章 →</a>
-		</div>
-	)}
+	</div>
 </Base>
-
-<style>
-	/* ⭐ Story 风格首页：简洁、干净、白底 */
-	.home-header {
-		padding: 2.5rem 0 2rem;
-		text-align: center;
-		border-bottom: 1px solid #eaeef3;
-		margin-bottom: 2rem;
-	}
-
-	.site-title {
-		font-size: clamp(2.2rem, 4vw, 3.6rem);
-		font-weight: 700;
-		color: #1a1a1a;
-		margin: 0 0 0.5rem;
-		letter-spacing: -0.03em;
-	}
-
-	.site-description {
-		font-size: 1.1rem;
-		color: #888;
-		margin: 0 0 1.2rem;
-		line-height: 1.6;
-		max-width: 520px;
-		margin-left: auto;
-		margin-right: auto;
-	}
-
-	.header-actions {
-		display: flex;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 0.8rem;
-	}
-
-	.btn-primary,
-	.btn-secondary {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.6rem 1.4rem;
-		border-radius: 6px;
-		font-size: 0.95rem;
-		text-decoration: none;
-		transition: background 0.2s, border-color 0.2s, transform 0.2s;
-	}
-
-	.btn-primary {
-		background: #3498db;
-		color: #ffffff;
-		border: 1px solid #3498db;
-	}
-
-	.btn-primary:hover {
-		background: #2980b9;
-		border-color: #2980b9;
-		transform: translateY(-2px);
-	}
-
-	.btn-secondary {
-		background: #ffffff;
-		color: #2c3e50;
-		border: 1px solid #eaeef3;
-	}
-
-	.btn-secondary:hover {
-		border-color: #3498db;
-		background: #f0f7fc;
-		transform: translateY(-2px);
-	}
-
-	/* ⭐ 文章网格 */
-	.home-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-		gap: 1.5rem;
-	}
-
-	/* ⭐ 空状态 */
-	.empty-state {
-		padding: 4rem 2rem;
-		text-align: center;
-		color: #999;
-		font-size: 1.05rem;
-		background: #fafbfc;
-		border-radius: 8px;
-		border: 1px solid #eaeef3;
-	}
-
-	/* ⭐ 查看全部 */
-	.view-all {
-		text-align: center;
-		margin-top: 2.5rem;
-		padding-top: 1.5rem;
-		border-top: 1px solid #eaeef3;
-	}
-
-	.view-all .btn-primary {
-		font-size: 1rem;
-		padding: 0.7rem 2rem;
-	}
-
-	/* ⭐ 响应式 */
-	@media (max-width: 640px) {
-		.home-header {
-			padding: 1.5rem 0 1.2rem;
-		}
-
-		.site-title {
-			font-size: 1.8rem;
-		}
-
-		.site-description {
-			font-size: 0.95rem;
-		}
-
-		.home-grid {
-			grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-			gap: 1rem;
-		}
-
-		.btn-primary,
-		.btn-secondary {
-			padding: 0.5rem 1rem;
-			font-size: 0.9rem;
-		}
-	}
-</style>

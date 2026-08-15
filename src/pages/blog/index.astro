@@ -12,7 +12,7 @@ const page = Number(Astro.url.searchParams.get("page") || "1");
 const limit = 10;
 const offset = (page - 1) * limit;
 
-interface ArchivePostSourceRow {
+interface ArchivePostRow {
 	title: string;
 	slug: string;
 	content: string;
@@ -24,21 +24,7 @@ interface ArchivePostSourceRow {
 	featuredImageAlt: string | null;
 }
 
-interface ArchivePostCardRow {
-	title: string;
-	slug: string;
-	excerpt: string | null;
-	publishedAt: string | null;
-	authorName: string | null;
-	categoryName: string | null;
-	featuredImageKey: string | null;
-	featuredImageAlt: string | null;
-	cjkCharCount: number;
-	latinWordCount: number;
-	estimatedReadingMinutes: number;
-}
-
-let posts: ArchivePostCardRow[] = [];
+let posts: ArchivePostRow[] = [];
 let totalPosts = 0;
 
 try {
@@ -50,7 +36,7 @@ try {
 		.where(getPublicPostVisibilityCondition());
 	totalPosts = countResult?.count ?? 0;
 
-	const rows: ArchivePostSourceRow[] = await db
+	const rows = await db
 		.select({
 			title: blogPosts.title,
 			slug: blogPosts.slug,
@@ -68,199 +54,65 @@ try {
 		.orderBy(desc(blogPosts.publishedAt))
 		.limit(limit)
 		.offset(offset);
-
-	posts = rows.map((row) => {
-		const readingStats = estimateArticleReadStats(row.content);
-
-		return {
-			title: row.title,
-			slug: row.slug,
-			excerpt: row.excerpt,
-			publishedAt: row.publishedAt,
-			authorName: row.authorName,
-			categoryName: row.categoryName,
-			featuredImageKey: row.featuredImageKey,
-			featuredImageAlt: row.featuredImageAlt,
-			cjkCharCount: readingStats.cjkCharCount,
-			latinWordCount: readingStats.latinWordCount,
-			estimatedReadingMinutes: readingStats.estimatedReadingMinutes,
-		};
-	});
+	posts = rows;
 } catch {
 	// D1 未绑定时回退为空列表
 }
 
 const totalPages = Math.ceil(totalPosts / limit);
+const hasPosts = posts.length > 0;
 ---
 
 <Base title="归档" description="按时间顺序浏览全部已发布文章">
-	<!-- ⭐ Story 风格：简洁的页面头部 -->
-	<section class="archive-header">
-		<h1 class="page-title">📖 归档</h1>
-		<p class="page-description">
-			所有已发布文章按时间顺序排列
-			<span class="post-count">共 {totalPosts} 篇</span>
-		</p>
-	</section>
-
-	<!-- ⭐ 文章网格 -->
-	{posts.length > 0 ? (
-		<div class="archive-grid">
-			{posts.map((post, index) => (
-				<PostCard
-					title={post.title}
-					slug={post.slug}
-					excerpt={post.excerpt}
-					publishedAt={post.publishedAt}
-					authorName={post.authorName}
-					categoryName={post.categoryName}
-					featuredImageKey={post.featuredImageKey}
-					featuredImageAlt={post.featuredImageAlt}
-					cjkCharCount={post.cjkCharCount}
-					latinWordCount={post.latinWordCount}
-					estimatedReadingMinutes={post.estimatedReadingMinutes}
-					coverSide={index % 2 === 0 ? "left" : "right"}
-				/>
-			))}
+	<div class="container-fluid">
+		<div class="row">
+			<div id="main" role="main">
+				<ul class="post-list clearfix">
+					{hasPosts ? (
+						posts.map((post) => (
+							<PostCard
+								title={post.title}
+								slug={post.slug}
+								excerpt={post.excerpt}
+								publishedAt={post.publishedAt}
+								authorName={post.authorName}
+								categoryName={post.categoryName}
+								featuredImageKey={post.featuredImageKey}
+								featuredImageAlt={post.featuredImageAlt}
+							/>
+						))
+					) : (
+						<li class="post-item grid-item">
+							<a class="post-link">
+								<h3 class="post-title">(´°̥̥̥̥̥̥̥̥ω°̥̥̥̥̥̥̥̥｀)<br />什么都没有找到唉...</h3>
+							</a>
+						</li>
+					)}
+				</ul>
+			</div>
 		</div>
-	) : (
-		<div class="empty-state">
-			<p>📭 还没有已发布文章。</p>
-		</div>
-	)}
+	</div>
 
 	<!-- ⭐ 分页 -->
 	{totalPages > 1 && (
-		<nav class="pagination" aria-label="分页">
-			{page > 1 ? (
-				<a href={`/blog?page=${page - 1}`} class="page-btn prev">← 上一页</a>
-			) : (
-				<span class="page-btn disabled">← 上一页</span>
-			)}
-			<span class="page-info">第 {page} / {totalPages} 页</span>
-			{page < totalPages ? (
-				<a href={`/blog?page=${page + 1}`} class="page-btn next">下一页 →</a>
-			) : (
-				<span class="page-btn disabled">下一页 →</span>
-			)}
-		</nav>
+		<div class="container-fluid">
+			<div class="row">
+				<div class="nav-page">
+					<ol class="page-navigator">
+						{page > 1 && (
+							<li class="prev"><a href={`/blog?page=${page - 1}`}>&laquo;</a></li>
+						)}
+						{Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+							<li class:list={[{ current: p === page }]}>
+								<a href={`/blog?page=${p}`}>{p}</a>
+							</li>
+						))}
+						{page < totalPages && (
+							<li class="next"><a href={`/blog?page=${page + 1}`}>&raquo;</a></li>
+						)}
+					</ol>
+				</div>
+			</div>
+		</div>
 	)}
 </Base>
-
-<style>
-	/* ⭐ Story 风格：简洁干净，无毛玻璃 */
-	.archive-header {
-		margin-bottom: 2.5rem;
-		padding: 1.5rem 0;
-		border-bottom: 1px solid #eaeef3;
-	}
-
-	.page-title {
-		font-size: 2.2rem;
-		font-weight: 700;
-		color: #1a1a1a;
-		margin: 0 0 0.4rem;
-		letter-spacing: -0.02em;
-	}
-
-	.page-description {
-		font-size: 1rem;
-		color: #888;
-		margin: 0;
-	}
-
-	.post-count {
-		display: inline-block;
-		margin-left: 0.8rem;
-		padding: 0.15rem 0.6rem;
-		border-radius: 12px;
-		background: #f0f2f4;
-		font-size: 0.85rem;
-		color: #666;
-	}
-
-	/* ⭐ 文章网格：响应式卡片布局 */
-	.archive-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-		gap: 1.5rem;
-	}
-
-	.empty-state {
-		padding: 4rem 2rem;
-		text-align: center;
-		color: #999;
-		font-size: 1.1rem;
-		background: #fafbfc;
-		border-radius: 8px;
-		border: 1px solid #eaeef3;
-	}
-
-	/* ⭐ 分页 */
-	.pagination {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.8rem;
-		margin-top: 2.5rem;
-		padding: 1.2rem 0;
-		border-top: 1px solid #eaeef3;
-	}
-
-	.page-btn {
-		display: inline-flex;
-		align-items: center;
-		padding: 0.5rem 1.2rem;
-		border-radius: 6px;
-		border: 1px solid #eaeef3;
-		background: #ffffff;
-		color: #2c3e50;
-		font-size: 0.9rem;
-		text-decoration: none;
-		transition: border-color 0.2s, background 0.2s, color 0.2s;
-		cursor: pointer;
-	}
-
-	.page-btn:hover:not(.disabled) {
-		border-color: #3498db;
-		background: #f0f7fc;
-		color: #3498db;
-	}
-
-	.page-btn.disabled {
-		opacity: 0.4;
-		cursor: not-allowed;
-	}
-
-	.page-info {
-		font-size: 0.9rem;
-		color: #999;
-		padding: 0 0.5rem;
-	}
-
-	/* ⭐ 响应式 */
-	@media (max-width: 640px) {
-		.archive-grid {
-			grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-			gap: 1rem;
-		}
-
-		.page-title {
-			font-size: 1.6rem;
-		}
-
-		.page-description {
-			font-size: 0.9rem;
-		}
-
-		.pagination {
-			flex-wrap: wrap;
-			gap: 0.5rem;
-		}
-
-		.page-btn {
-			padding: 0.4rem 0.9rem;
-			font-size: 0.85rem;
-		}
-	}
-</style>
