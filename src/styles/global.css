@@ -12,7 +12,8 @@
 	display: grid;
 	grid-template-columns: repeat(1, 1fr);
 	gap: 20px;
-	padding: 0;
+	padding-left: 24px;
+	padding-right: 24px;
 	margin: 0;
 	list-style: none;
 }
@@ -21,6 +22,8 @@
 	.post-list {
 		grid-template-columns: repeat(2, 1fr);
 		gap: 24px;
+		padding-left: 40px;
+		padding-right: 40px;
 	}
 }
 
@@ -28,6 +31,8 @@
 	.post-list {
 		grid-template-columns: repeat(3, 1fr);
 		gap: 28px;
+		padding-left: 60px;
+		padding-right: 60px;
 	}
 }
 
@@ -35,6 +40,8 @@
 	.post-list {
 		grid-template-columns: repeat(4, 1fr);
 		gap: 32px;
+		padding-left: 80px;
+		padding-right: 80px;
 	}
 }
 
