@@ -28,7 +28,6 @@ const coverImageAlt = featuredImageAlt?.trim() || `${title} 的封面图`;
 const hasCover = Boolean(coverImageUrl);
 const encodedSlug = encodeRouteParam(slug);
 const displayCategory = categoryName || "未分类";
-const displayAuthor = authorName || "";
 ---
 
 <article class="post-item grid-item" itemscope itemtype="http://schema.org/BlogPosting">
@@ -43,43 +42,39 @@ const displayAuthor = authorName || "";
 			<span class="cover cover-placeholder"></span>
 		)}
 		
-		<!-- 左上角：分类标签（灰色边框同色矩形） -->
+		<!-- ⭐ 左上角：分类标签（紧贴边角，无圆角） -->
 		<div class="post-category-tag">{displayCategory}</div>
 		
-		<!-- 右下角：毛玻璃信息卡 -->
+		<!-- ⭐ 右下角：信息卡（无圆角无边框，日期在上标题在下） -->
 		<div class="post-info-card">
-			<h3 class="post-title">{title}</h3>
 			{formattedDate && (
 				<time class="post-date" datetime={publishedAt ?? undefined}>
 					{formattedDate}
 				</time>
 			)}
-			{displayAuthor && !categoryName && (
-				<span class="post-author">{displayAuthor}</span>
-			)}
+			<h3 class="post-title">{title}</h3>
 		</div>
 	</a>
 </article>
 
 <style is:global>
-	/* ⭐ 正方形卡片容器 */
+	/* ⭐ 正方形卡片容器 - 3px 灰色边框，无圆角，无动画 */
 	.post-item {
 		position: relative;
 		aspect-ratio: 1 / 1;
 		width: 100%;
 		overflow: hidden;
-		border: 1px solid #d0d5da; /* 灰色边框 */
-		border-radius: 6px;
+		border: 3px solid #d0d5da;
+		border-radius: 0;
 		background: #f5f6f8;
-		transition: transform 0.3s ease, box-shadow 0.3s ease;
+		transition: border-color 0.25s ease;
 	}
 
+	/* ⭐ 悬浮时边框变 #FF7575，无其他动画 */
 	.post-item:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+		border-color: #FF7575;
 	}
 
-	/* ⭐ 封面图 - 铺满整个卡片 */
 	.post-link {
 		display: block;
 		width: 100%;
@@ -89,12 +84,12 @@ const displayAuthor = authorName || "";
 		position: relative;
 	}
 
+	/* ⭐ 封面图 - 铺满 */
 	.cover {
 		display: block;
 		width: 100%;
 		height: 100%;
 		background: #e8ecf0 center/cover no-repeat;
-		transition: transform 0.4s ease;
 	}
 
 	.cover-placeholder {
@@ -108,60 +103,58 @@ const displayAuthor = authorName || "";
 		100% { background-position: 100% 100%; }
 	}
 
-	.post-item:hover .cover {
-		transform: scale(1.04);
-	}
-
-	/* ⭐ 左上角：分类标签（灰色边框同色矩形） */
+	/* ⭐ 左上角分类标签 - 紧贴边角，无圆角 */
 	.post-category-tag {
 		position: absolute;
-		top: 12px;
-		left: 12px;
+		top: 0;
+		left: 0;
 		z-index: 2;
-		padding: 4px 14px;
-		font-size: 0.72rem;
+		padding: 4px 12px;
+		font-size: 0.7rem;
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		text-transform: uppercase;
-		color: #6b7280;
+		color: #4a4a4a;
 		background: rgba(255, 255, 255, 0.92);
-		border: 1px solid #d0d5da; /* 与卡片边框同色 */
-		border-radius: 3px;
+		border: 1px solid #d0d5da;
+		border-radius: 0;
 		backdrop-filter: blur(4px);
 		-webkit-backdrop-filter: blur(4px);
-		box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 		white-space: nowrap;
-		max-width: calc(100% - 40px);
+		max-width: calc(100% - 8px);
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
-	/* ⭐ 右下角：毛玻璃信息卡 */
+	/* ⭐ 右下角信息卡 - 无圆角无边框，日期在上标题在下 */
 	.post-info-card {
 		position: absolute;
-		bottom: 14px;
-		right: 14px;
-		left: 14px;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		z-index: 2;
-		padding: 10px 14px 12px;
-		background: rgba(255, 255, 255, 0.68);
-		backdrop-filter: blur(12px) saturate(140%);
-		-webkit-backdrop-filter: blur(12px) saturate(140%);
-		border: 1px solid rgba(255, 255, 255, 0.50);
-		border-radius: 6px;
-		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-		transition: background 0.3s ease, transform 0.3s ease;
+		padding: 8px 14px 10px;
+		background: rgba(255, 255, 255, 0.72);
+		backdrop-filter: blur(10px) saturate(140%);
+		-webkit-backdrop-filter: blur(10px) saturate(140%);
+		border: none;
+		border-radius: 0;
 	}
 
-	.post-item:hover .post-info-card {
-		background: rgba(255, 255, 255, 0.82);
-		transform: translateY(-2px);
+	/* 日期 - 在上方 */
+	.post-date {
+		display: block;
+		font-size: 0.65rem;
+		font-weight: 400;
+		color: #8e95a3;
+		letter-spacing: 0.02em;
+		margin-bottom: 1px;
 	}
 
-	/* 标题 */
+	/* 标题 - 在下方，比分类标签大一点点 */
 	.post-title {
-		margin: 0 0 2px 0;
-		font-size: clamp(0.92rem, 1.1vw, 1.15rem);
+		margin: 0;
+		font-size: 0.85rem;
 		font-weight: 600;
 		line-height: 1.3;
 		color: #1a1a1a;
@@ -172,63 +165,40 @@ const displayAuthor = authorName || "";
 		word-break: break-word;
 	}
 
-	/* 日期 */
-	.post-date {
-		display: block;
-		font-size: 0.78rem;
-		font-weight: 400;
-		color: #8e95a3;
-		letter-spacing: 0.02em;
-		margin-top: 1px;
-	}
-
-	/* 作者（可选，仅当没有分类时显示） */
-	.post-author {
-		display: block;
-		font-size: 0.72rem;
-		color: #9aa1b0;
-		margin-top: 1px;
-	}
-
 	/* ⭐ 响应式 */
 	@media (max-width: 640px) {
 		.post-category-tag {
-			top: 8px;
-			left: 8px;
 			padding: 3px 10px;
-			font-size: 0.65rem;
+			font-size: 0.6rem;
 		}
 		.post-info-card {
-			bottom: 10px;
-			right: 10px;
-			left: 10px;
-			padding: 8px 10px 10px;
-		}
-		.post-title {
-			font-size: 0.85rem;
+			padding: 6px 10px 8px;
 		}
 		.post-date {
-			font-size: 0.7rem;
+			font-size: 0.6rem;
+		}
+		.post-title {
+			font-size: 0.78rem;
 		}
 	}
 
 	@media (max-width: 480px) {
-		.post-info-card {
-			bottom: 8px;
-			right: 8px;
-			left: 8px;
-			padding: 6px 8px 8px;
-			border-radius: 4px;
-		}
-		.post-title {
-			font-size: 0.78rem;
-			-webkit-line-clamp: 2;
+		.post-item {
+			border-width: 2px;
 		}
 		.post-category-tag {
-			top: 6px;
-			left: 6px;
 			padding: 2px 8px;
-			font-size: 0.6rem;
+			font-size: 0.55rem;
+		}
+		.post-info-card {
+			padding: 4px 8px 6px;
+		}
+		.post-date {
+			font-size: 0.55rem;
+		}
+		.post-title {
+			font-size: 0.72rem;
+			-webkit-line-clamp: 2;
 		}
 	}
 </style>
