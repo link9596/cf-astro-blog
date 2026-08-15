@@ -1,7 +1,5 @@
 {
-  "keep_vars": true
-}
-{
+  	"keep_vars": true,
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": "@astrojs/cloudflare/entrypoints/server",
 	"name": "astro-blog-film",
