@@ -1,3 +1,143 @@
+	.site-header {
+		padding: 20px 30px 30px 30px;
+		background: transparent;
+	}
+
+	.header-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0.8rem;
+	}
+
+	.logo {
+		display: flex;
+		align-items: center;
+		gap: 0.15rem;
+		font-size: 1.8rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		font-family: 'Georgia', serif;
+	}
+
+	.letter {
+		color: #2c3e50;
+		transition: color 0.2s;
+	}
+
+	.brand-link {
+		text-decoration: none;
+	}
+
+	.brand-letter {
+		color: #3498db;
+	}
+
+	.letter:hover {
+		color: #3498db;
+	}
+
+	.header-subtitle {
+		margin-left: 0.75rem;
+		font-size: 0.85rem;
+		font-weight: 400;
+		color: #999;
+		letter-spacing: 0.02em;
+	}
+
+	.nav-buttons {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
+	.nav-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.4rem 0.6rem;
+		border-radius: 6px;
+		color: #888;
+		text-decoration: none;
+		font-size: 1.1rem;
+		transition: color 0.2s, background 0.2s;
+		cursor: pointer;
+	}
+
+	.nav-btn:hover {
+		color: #3498db;
+		background: #f0f2f4;
+	}
+
+	.nav-icon {
+		line-height: 1;
+	}
+
+	/* 下拉菜单 */
+	.menu-dropdown,
+	.search-dropdown {
+		position: absolute;
+		top: 100%;
+		right: 0;
+		margin-top: 0.5rem;
+		min-width: 160px;
+		background: #ffffff;
+		border: 1px solid #eaeef3;
+		border-radius: 8px;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+		padding: 0.5rem 0;
+		z-index: 100;
+	}
+
+	.menu-dropdown a {
+		display: block;
+		padding: 0.5rem 1.2rem;
+		color: #2c3e50;
+		text-decoration: none;
+		font-size: 0.92rem;
+		transition: background 0.2s, color 0.2s;
+	}
+
+	.menu-dropdown a:hover {
+		background: #f0f2f4;
+		color: #3498db;
+	}
+
+	.search-dropdown {
+		min-width: 220px;
+		padding: 0.8rem 1rem;
+	}
+
+	.search-dropdown input {
+		width: 100%;
+		padding: 0.5rem 0.8rem;
+		border: 1px solid #eaeef3;
+		border-radius: 6px;
+		font-size: 0.92rem;
+		outline: none;
+		transition: border-color 0.2s;
+	}
+
+	.search-dropdown input:focus {
+		border-color: #3498db;
+	}
+
+	/* 响应式 */
+	@media (max-width: 640px) {
+		.logo {
+			font-size: 1.4rem;
+		}
+		.header-subtitle {
+			font-size: 0.75rem;
+			margin-left: 0.4rem;
+		}
+		.nav-btn {
+			padding: 0.3rem 0.4rem;
+			font-size: 1rem;
+		}
+	}
+
 /* ⭐ Story 文章网格 - 响应式 */
 .post-list {
   display: grid;
