@@ -57,7 +57,7 @@ export function sanitizeSlug(value: unknown): string | null {
 
 export function buildUrlSlug(
 	value: unknown,
-	options?: { fallbackPrefix?: string; maxLength?: number },
+	options?: { fallbackPrefix?: string; maxLength?: string },
 ): string {
 	const fallbackPrefix =
 		sanitizeSlug(options?.fallbackPrefix || "post") || "post";
@@ -372,31 +372,8 @@ async function renderSafeMarkdownInternal(
 
 	const renderer = new marked.Renderer();
 
-renderer.html = (token: Tokens.HTML | Tokens.Tag) => {
-    const rawHtml = token?.text ?? token?.raw ?? "";
-    // 使用 sanitize-html 过滤，只允许你指定的标签和属性
-    return sanitizeHtml(rawHtml, {
-        allowedTags: [
-            'a', 'img', 'div', 'video', 'source',
-            'p', 'br', 'strong', 'em', 'b', 'i', 'u', 's', 'span',
-            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-            'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'hr',
-            'table', 'thead', 'tbody', 'tr', 'th', 'td'
-        ],
-        allowedAttributes: {
-            'a': ['href', 'target', 'title', 'class'],
-            'img': ['src', 'alt', 'title', 'loading', 'decoding', 'class'],
-            'div': ['class', 'id'],
-            'video': ['src', 'poster', 'playsinline', 'muted', 'preload', 'controls', 'loop', 'class', 'autoplay'],
-            'source': ['src', 'type'],
-            'span': ['class'],
-            // 允许任何标签的 class 属性
-            '*': ['class']
-        },
-        allowedSchemes: ['http', 'https', 'mailto'],
-        allowVulnerableTags: false,  // 保持安全
-    });
-};
+	// 🔥 关键修改：移除 renderer.html，不再单独处理 HTML 标签
+	// 改为在整体 HTML 净化时统一处理
 
 	renderer.link = function (token: Tokens.Link) {
 		const text = this.parser.parseInline(token.tokens ?? []);
@@ -459,6 +436,31 @@ renderer.html = (token: Tokens.HTML | Tokens.Tag) => {
 	});
 	let html = typeof rendered === "string" ? rendered : await rendered;
 
+	// 🔥 关键修改：整体净化 HTML，允许指定的标签和属性
+	html = sanitizeHtml(html, {
+		allowedTags: [
+			'a', 'img', 'div', 'video', 'source',
+			'p', 'br', 'strong', 'em', 'b', 'i', 'u', 's', 'span',
+			'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+			'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'hr',
+			'table', 'thead', 'tbody', 'tr', 'th', 'td',
+			'details', 'summary'   // 支持短代码生成的 details/summary
+		],
+		allowedAttributes: {
+			'a': ['href', 'target', 'title', 'class'],
+			'img': ['src', 'alt', 'title', 'loading', 'decoding', 'class'],
+			'div': ['class', 'id'],
+			'video': ['src', 'poster', 'playsinline', 'muted', 'preload', 'controls', 'loop', 'class', 'autoplay'],
+			'source': ['src', 'type'],
+			'span': ['class'],
+			// 允许任何标签的 class 属性（方便样式）
+			'*': ['class']
+		},
+		allowedSchemes: ['http', 'https', 'mailto'],
+		allowVulnerableTags: false,
+	});
+
+	// 恢复 spoiler 和 details 短代码占位符
 	for (const block of extractedSpoilers.blocks) {
 		const spoilerHtml = `<span class="prose-spoiler">${escapeHtml(block.content).replaceAll("\n", "<br>")}</span>`;
 		const placeholderPattern = escapeRegExp(block.placeholder);
