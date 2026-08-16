@@ -1,6 +1,6 @@
-const zhDateFormatter = new Intl.DateTimeFormat("zh-CN", {
+const zhDateFormatter = new Intl.DateTimeFormat("en-US", {
 	year: "numeric",
-	month: "long",
+	month: "short",
 	day: "numeric",
 });
 
