@@ -1,11 +1,5 @@
 /* ⭐ Story 文章网格 - 响应式 */
-.post-list {
-	display: grid;
-	grid-template-columns: repeat(1, 1fr);
-	gap: 20px;
-	padding: 0 20px;
-	margin: 0;
-	list-style: none;
+.post-list {display:grid;grid-template-columns:repeat(1,1fr);gap:20px;padding:0 20px;margin:0;list-style:none
 }
 
 @media (min-width: 640px) {
