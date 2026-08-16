@@ -1,6 +1,6 @@
 ---
 import { env } from "cloudflare:workers";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import PostCard from "@/components/PostCard.astro";
 import { blogCategories, blogPosts } from "@/db/schema";
 import Base from "@/layouts/Base.astro";
@@ -8,149 +8,211 @@ import { getDb } from "@/lib/db";
 import { estimateArticleReadStats } from "@/lib/format";
 import { getPublicPostVisibilityCondition } from "@/lib/public-content";
 import {
-	DEFAULT_SITE_APPEARANCE,
-	getSiteAppearance,
-	resolveSiteDescriptionFromAppearance,
+  DEFAULT_SITE_APPEARANCE,
+  getSiteAppearance,
+  resolveSiteDescriptionFromAppearance,
 } from "@/lib/site-appearance";
 import { siteConfig } from "@/lib/types";
 
 interface HomePostCardRow {
-	title: string;
-	slug: string;
-	excerpt: string | null;
-	publishedAt: string | null;
-	authorName: string | null;
-	categoryName: string | null;
-	featuredImageKey: string | null;
-	featuredImageAlt: string | null;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  publishedAt: string | null;
+  authorName: string | null;
+  categoryName: string | null;
+  featuredImageKey: string | null;
+  featuredImageAlt: string | null;
 }
 
 let pinnedPosts: HomePostCardRow[] = [];
 let recentPosts: HomePostCardRow[] = [];
 let homepageAppearance = DEFAULT_SITE_APPEARANCE;
+let totalPages = 0;
+
+// ---------- 分页参数 ----------
+const currentPage = Number(Astro.url.searchParams.get("page")) || 1;
+const limit = 10; // 每页文章数
+const offset = (currentPage - 1) * limit;
 
 function toHomePostCardRow(row: {
-	title: string;
-	slug: string;
-	content: string;
-	excerpt: string | null;
-	publishedAt: string | null;
-	authorName: string | null;
-	categoryName: string | null;
-	featuredImageKey: string | null;
-	featuredImageAlt: string | null;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  publishedAt: string | null;
+  authorName: string | null;
+  categoryName: string | null;
+  featuredImageKey: string | null;
+  featuredImageAlt: string | null;
 }): HomePostCardRow {
-	const readingStats = estimateArticleReadStats(row.content);
-	return {
-		title: row.title,
-		slug: row.slug,
-		excerpt: row.excerpt,
-		publishedAt: row.publishedAt,
-		authorName: row.authorName,
-		categoryName: row.categoryName,
-		featuredImageKey: row.featuredImageKey,
-		featuredImageAlt: row.featuredImageAlt,
-	};
+  const readingStats = estimateArticleReadStats(row.content);
+  return {
+    title: row.title,
+    slug: row.slug,
+    excerpt: row.excerpt,
+    publishedAt: row.publishedAt,
+    authorName: row.authorName,
+    categoryName: row.categoryName,
+    featuredImageKey: row.featuredImageKey,
+    featuredImageAlt: row.featuredImageAlt,
+  };
 }
 
 try {
-	const db = getDb(env.DB);
-	homepageAppearance = await getSiteAppearance(db);
+  const db = getDb(env.DB);
+  homepageAppearance = await getSiteAppearance(db);
 
-	const pinnedRows = await db
-		.select({
-			title: blogPosts.title,
-			slug: blogPosts.slug,
-			content: blogPosts.content,
-			excerpt: blogPosts.excerpt,
-			publishedAt: blogPosts.publishedAt,
-			authorName: blogPosts.authorName,
-			categoryName: blogCategories.name,
-			featuredImageKey: blogPosts.featuredImageKey,
-			featuredImageAlt: blogPosts.featuredImageAlt,
-		})
-		.from(blogPosts)
-		.leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
-		.where(
-			and(getPublicPostVisibilityCondition(), eq(blogPosts.isPinned, true)),
-		)
-		.orderBy(
-			asc(blogPosts.pinnedOrder),
-			desc(blogPosts.publishedAt),
-			desc(blogPosts.createdAt),
-		)
-		.limit(6);
-	pinnedPosts = pinnedRows.map(toHomePostCardRow);
+  // ---- 1. 查询置顶文章（不分页，始终显示） ----
+  const pinnedRows = await db
+    .select({
+      title: blogPosts.title,
+      slug: blogPosts.slug,
+      content: blogPosts.content,
+      excerpt: blogPosts.excerpt,
+      publishedAt: blogPosts.publishedAt,
+      authorName: blogPosts.authorName,
+      categoryName: blogCategories.name,
+      featuredImageKey: blogPosts.featuredImageKey,
+      featuredImageAlt: blogPosts.featuredImageAlt,
+    })
+    .from(blogPosts)
+    .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
+    .where(
+      and(getPublicPostVisibilityCondition(), eq(blogPosts.isPinned, true))
+    )
+    .orderBy(
+      asc(blogPosts.pinnedOrder),
+      desc(blogPosts.publishedAt),
+      desc(blogPosts.createdAt)
+    )
+    .limit(6);
+  pinnedPosts = pinnedRows.map(toHomePostCardRow);
 
-	const recentRows = await db
-		.select({
-			title: blogPosts.title,
-			slug: blogPosts.slug,
-			content: blogPosts.content,
-			excerpt: blogPosts.excerpt,
-			publishedAt: blogPosts.publishedAt,
-			authorName: blogPosts.authorName,
-			categoryName: blogCategories.name,
-			featuredImageKey: blogPosts.featuredImageKey,
-			featuredImageAlt: blogPosts.featuredImageAlt,
-		})
-		.from(blogPosts)
-		.leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
-		.where(
-			and(getPublicPostVisibilityCondition(), eq(blogPosts.isPinned, false)),
-		)
-		.orderBy(desc(blogPosts.publishedAt), desc(blogPosts.createdAt))
-		.limit(10);
-	recentPosts = recentRows.map(toHomePostCardRow);
+  // ---- 2. 统计非置顶文章总数（用于分页） ----
+  const countResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(blogPosts)
+    .where(
+      and(getPublicPostVisibilityCondition(), eq(blogPosts.isPinned, false))
+    );
+  const totalNonPinned = countResult[0]?.count || 0;
+  totalPages = Math.ceil(totalNonPinned / limit);
+
+  // 如果当前页码超出总页数，重定向到最后一页（或首页）
+  if (totalPages > 0 && currentPage > totalPages) {
+    return Astro.redirect(`/?page=${totalPages}`);
+  }
+
+  // ---- 3. 查询当前页的非置顶文章 ----
+  const recentRows = await db
+    .select({
+      title: blogPosts.title,
+      slug: blogPosts.slug,
+      content: blogPosts.content,
+      excerpt: blogPosts.excerpt,
+      publishedAt: blogPosts.publishedAt,
+      authorName: blogPosts.authorName,
+      categoryName: blogCategories.name,
+      featuredImageKey: blogPosts.featuredImageKey,
+      featuredImageAlt: blogPosts.featuredImageAlt,
+    })
+    .from(blogPosts)
+    .leftJoin(blogCategories, eq(blogPosts.categoryId, blogCategories.id))
+    .where(
+      and(getPublicPostVisibilityCondition(), eq(blogPosts.isPinned, false))
+    )
+    .orderBy(desc(blogPosts.publishedAt), desc(blogPosts.createdAt))
+    .limit(limit)
+    .offset(offset);
+  recentPosts = recentRows.map(toHomePostCardRow);
 } catch {
-	// D1 未绑定时首页退化为空列表
+  // D1 未绑定时降级为空列表
 }
 
 const allPosts = [...pinnedPosts, ...recentPosts];
 const hasPosts = allPosts.length > 0;
+// 确保 currentPage 有效（至少为 1）
+const validPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
 ---
 
 <Base title={siteConfig.name} description={siteConfig.description}>
-	<!-- ⭐ 直接使用 Story 的 HTML 结构，容器用 container-fluid -->
-	<div class="container-fluid">
-		<div class="row">
-			<div id="main" role="main">
-				<ul class="post-list clearfix">
-					{hasPosts ? (
-						allPosts.map((post) => (
-							<PostCard
-								title={post.title}
-								slug={post.slug}
-								excerpt={post.excerpt}
-								publishedAt={post.publishedAt}
-								authorName={post.authorName}
-								categoryName={post.categoryName}
-								featuredImageKey={post.featuredImageKey}
-								featuredImageAlt={post.featuredImageAlt}
-							/>
-						))
-					) : (
-						<li class="post-item grid-item">
-							<a class="post-link">
-								<h3 class="post-title">还没有文章<br />去后台发布吧</h3>
-							</a>
-						</li>
-					)}
-				</ul>
-			</div>
-		</div>
-	</div>
+  <!-- 文章列表 -->
+  <div class="container-fluid">
+    <div class="row">
+      <div id="main" role="main">
+        <ul class="post-list clearfix">
+          {hasPosts ? (
+            allPosts.map((post) => (
+              <PostCard
+                title={post.title}
+                slug={post.slug}
+                excerpt={post.excerpt}
+                publishedAt={post.publishedAt}
+                authorName={post.authorName}
+                categoryName={post.categoryName}
+                featuredImageKey={post.featuredImageKey}
+                featuredImageAlt={post.featuredImageAlt}
+              />
+            ))
+          ) : (
+            <li class="post-item grid-item">
+              <a class="post-link">
+                <h3 class="post-title">还没有文章<br />去后台发布吧</h3>
+              </a>
+            </li>
+          )}
+        </ul>
+      </div>
+    </div>
+  </div>
 
-	<!-- ⭐ 分页 -->
-	<div class="container-fluid">
-		<div class="row">
-			<div class="nav-page">
-				<ol class="page-navigator">
-					<li class="current"><a href="/">1</a></li>
-					<li><a href="/page/2">2</a></li>
-					<li><a href="/page/3">3</a></li>
-				</ol>
-			</div>
-		</div>
-	</div>
+  <!-- 分页导航（仅当总页数 > 1 时显示） -->
+  {totalPages > 1 && (
+    <div class="container-fluid">
+      <div class="row">
+        <div class="nav-page">
+          <ol class="page-navigator">
+            <!-- 上一页 -->
+            {currentPage > 1 && (
+              <li>
+                <a href={`?page=${currentPage - 1}`}>«</a>
+              </li>
+            )}
+
+            <!-- 生成页码列表（显示当前页前后各2页，并包含首尾页） -->
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(
+                (p) =>
+                  Math.abs(p - currentPage) <= 2 ||
+                  p === 1 ||
+                  p === totalPages
+              )
+              .map((p, index, arr) => {
+                // 若与前一项断层，插入省略号
+                if (index > 0 && arr[index - 1] !== p - 1) {
+                  return (
+                    <li key={`ellipsis-${p}`}>
+                      <span>…</span>
+                    </li>
+                  );
+                }
+                return (
+                  <li key={p} class={p === currentPage ? "current" : ""}>
+                    <a href={`?page=${p}`}>{p}</a>
+                  </li>
+                );
+              })}
+
+            <!-- 下一页 -->
+            {currentPage < totalPages && (
+              <li>
+                <a href={`?page=${currentPage + 1}`}>»</a>
+              </li>
+            )}
+          </ol>
+        </div>
+      </div>
+    </div>
+  )}
 </Base>
