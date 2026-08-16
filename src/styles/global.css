@@ -7,22 +7,34 @@
   margin: 0 auto;
   width: 100%;
   max-width: 1280px;
-  list-style: none;   /* 如果还在用 ul */
+  list-style: none;
 }
 
 @media (min-width: 640px) {
-  .post-list { grid-template-columns: repeat(2, 1fr); }
+  .post-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-@media (min-width: 1024px) {
-  .post-list { grid-template-columns: repeat(4, 1fr); }
+/* 920px 及以上：3 列（覆盖 2 列） */
+@media (min-width: 920px) {
+  .post-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 1300px 及以上：4 列（覆盖 3 列） */
+@media (min-width: 1300px) {
+  .post-list {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 @media (min-width: 1400px) {
 	.post-list {
 		grid-template-columns: repeat(4, 1fr);
 		gap: 32px;
-		padding-left: 0 100px;
+		padding: 0 100px;
 	}
 }
 
@@ -249,7 +261,7 @@
 
 
 :root {
-	--color-bg: #edf3f8;
+	--color-bg: #fff;
 	--color-bg-secondary: rgba(255, 255, 255, 0.34);
 	--color-bg-tertiary: rgba(255, 255, 255, 0.22);
 	--color-surface-elevated: rgba(255, 255, 255, 0.6);
@@ -427,7 +439,6 @@ body {
         font-family: var(--font-serif-body);
         font-weight: 400;
         line-height: 1.75;
-        background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center/cover no-repeat;
 }
 
 body::before {
@@ -447,7 +458,7 @@ content: '';
     -o-filter: grayscale(10%);
     filter: grayscale(10%);
     filter: gray;
-  background: url(https://demo.atlinker.cn/PHOTO/usr/themes/Story/bkg.png) center / cover no-repeat;
+  background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center / cover no-repeat;
 }
 
 /* ---------- 分页器容器 ---------- */
