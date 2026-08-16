@@ -1,4 +1,5 @@
 import { marked, type Tokens } from "marked";
+import sanitizeHtml from 'sanitize-html';
 
 const POST_STATUS_VALUES = ["draft", "published", "scheduled"] as const;
 const SAFE_HTTP_URL_PROTOCOLS = new Set(["http:", "https:"]);
@@ -371,9 +372,31 @@ async function renderSafeMarkdownInternal(
 
 	const renderer = new marked.Renderer();
 
-	renderer.html = (token: Tokens.HTML | Tokens.Tag) => {
-		return escapeHtml(token?.text ?? token?.raw ?? "");
-	};
+renderer.html = (token: Tokens.HTML | Tokens.Tag) => {
+    const rawHtml = token?.text ?? token?.raw ?? "";
+    // 使用 sanitize-html 过滤，只允许你指定的标签和属性
+    return sanitizeHtml(rawHtml, {
+        allowedTags: [
+            'a', 'img', 'div', 'video', 'source',
+            'p', 'br', 'strong', 'em', 'b', 'i', 'u', 's', 'span',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'hr',
+            'table', 'thead', 'tbody', 'tr', 'th', 'td'
+        ],
+        allowedAttributes: {
+            'a': ['href', 'target', 'title', 'class'],
+            'img': ['src', 'alt', 'title', 'loading', 'decoding', 'class'],
+            'div': ['class', 'id'],
+            'video': ['src', 'poster', 'playsinline', 'muted', 'preload', 'controls', 'loop', 'class', 'autoplay'],
+            'source': ['src', 'type'],
+            'span': ['class'],
+            // 允许任何标签的 class 属性
+            '*': ['class']
+        },
+        allowedSchemes: ['http', 'https', 'mailto'],
+        allowVulnerableTags: false,  // 保持安全
+    });
+};
 
 	renderer.link = function (token: Tokens.Link) {
 		const text = this.parser.parseInline(token.tokens ?? []);
