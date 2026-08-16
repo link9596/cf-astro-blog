@@ -1,21 +1,21 @@
 /* ⭐ Story 文章网格 - 响应式 */
-.post-list {display:grid;grid-template-columns:repeat(1,1fr);gap:20px;padding:0 20px;margin:0;list-style:none
+.post-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  padding: 0 20px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1280px;
+  list-style: none;   /* 如果还在用 ul */
 }
 
 @media (min-width: 640px) {
-	.post-list {
-		grid-template-columns: repeat(2, 1fr);
-		gap: 24px;
-		padding: 0 58px;
-	}
+  .post-list { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (min-width: 1024px) {
-	.post-list {
-		grid-template-columns: repeat(3, 1fr);
-		gap: 28px;
-		padding: 0 80px;
-	}
+  .post-list { grid-template-columns: repeat(4, 1fr); }
 }
 
 @media (min-width: 1400px) {
