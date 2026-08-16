@@ -5,50 +5,50 @@ import type { MarkdownTocItem } from "@/lib/security";
 import Base from "./Base.astro";
 
 interface Props {
-	slug: string;
-	title: string;
-	description?: string;
-	image?: string;
-	canonicalUrl?: string;
-	publishedAt?: string;
-	authorName?: string;
-	categoryName?: string;
-	articleSidebarAvatarPath?: string;
-	articleSidebarName?: string;
-	articleSidebarBadge?: string;
-	articleSidebarBio?: string;
-	cjkCharCount?: number;
-	latinWordCount?: number;
-	estimatedReadingMinutes?: number;
-	backgroundOverride?: {
-		imageKey: string;
-		opacity: number;
-		blur: number;
-		scale: number;
-		positionX: number;
-		positionY: number;
-	};
-	toc?: MarkdownTocItem[];
+  slug: string;
+  title: string;
+  description?: string;
+  image?: string;
+  canonicalUrl?: string;
+  publishedAt?: string;
+  authorName?: string;
+  categoryName?: string;
+  articleSidebarAvatarPath?: string;
+  articleSidebarName?: string;
+  articleSidebarBadge?: string;
+  articleSidebarBio?: string;
+  cjkCharCount?: number;
+  latinWordCount?: number;
+  estimatedReadingMinutes?: number;
+  backgroundOverride?: {
+    imageKey: string;
+    opacity: number;
+    blur: number;
+    scale: number;
+    positionX: number;
+    positionY: number;
+  };
+  toc?: MarkdownTocItem[];
 }
 
 const {
-	slug,
-	title,
-	description,
-	image,
-	canonicalUrl,
-	publishedAt,
-	authorName,
-	categoryName,
-	articleSidebarAvatarPath,
-	articleSidebarName,
-	articleSidebarBadge,
-	articleSidebarBio,
-	cjkCharCount,
-	latinWordCount,
-	estimatedReadingMinutes,
-	backgroundOverride,
-	toc,
+  slug,
+  title,
+  description,
+  image,
+  canonicalUrl,
+  publishedAt,
+  authorName,
+  categoryName,
+  articleSidebarAvatarPath,
+  articleSidebarName,
+  articleSidebarBadge,
+  articleSidebarBio,
+  cjkCharCount,
+  latinWordCount,
+  estimatedReadingMinutes,
+  backgroundOverride,
+  toc,
 } = Astro.props;
 
 const formattedDate = publishedAt ? formatDate(publishedAt) : null;
@@ -56,126 +56,126 @@ const sidebarName = articleSidebarName?.trim() || authorName?.trim() || "博主"
 const sidebarBadge = articleSidebarBadge?.trim() || "文章作者";
 const sidebarBio = articleSidebarBio?.trim() || "在这里记录技术、生活和折腾。";
 const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
-const safeCjkCharCount =
-	Number.isFinite(cjkCharCount) && Number(cjkCharCount) > 0
-		? Math.trunc(Number(cjkCharCount))
-		: 0;
-const safeLatinWordCount =
-	Number.isFinite(latinWordCount) && Number(latinWordCount) > 0
-		? Math.trunc(Number(latinWordCount))
-		: 0;
-const safeEstimatedReadingMinutes =
-	Number.isFinite(estimatedReadingMinutes) &&
-	Number(estimatedReadingMinutes) > 0
-		? Math.trunc(Number(estimatedReadingMinutes))
-		: 1;
-const countLabelParts: string[] = [];
 
+// 字数/阅读时间依然计算（可能其他地方使用），但不再显示在 meta 中
+const safeCjkCharCount =
+  Number.isFinite(cjkCharCount) && Number(cjkCharCount) > 0
+    ? Math.trunc(Number(cjkCharCount))
+    : 0;
+const safeLatinWordCount =
+  Number.isFinite(latinWordCount) && Number(latinWordCount) > 0
+    ? Math.trunc(Number(latinWordCount))
+    : 0;
+const safeEstimatedReadingMinutes =
+  Number.isFinite(estimatedReadingMinutes) &&
+  Number(estimatedReadingMinutes) > 0
+    ? Math.trunc(Number(estimatedReadingMinutes))
+    : 1;
+const countLabelParts: string[] = [];
 if (safeCjkCharCount > 0) {
-	countLabelParts.push(`${safeCjkCharCount.toLocaleString("zh-CN")} 字`);
+  countLabelParts.push(`${safeCjkCharCount.toLocaleString("zh-CN")} 字`);
 }
 if (safeLatinWordCount > 0) {
-	countLabelParts.push(`${safeLatinWordCount.toLocaleString("en-US")} 词`);
+  countLabelParts.push(`${safeLatinWordCount.toLocaleString("en-US")} 词`);
 }
 const articleLengthLabel =
-	countLabelParts.length > 0 ? countLabelParts.join(" / ") : "0 字";
+  countLabelParts.length > 0 ? countLabelParts.join(" / ") : "0 字";
 const articleReadingTimeLabel = `约 ${safeEstimatedReadingMinutes.toLocaleString("zh-CN")} 分钟`;
 
-// ⭐ 修改：处理目录树，用于 Story 风格的底部折叠目录
+// ⭐ 修改：构建元数据句子
+let metaParts: string[] = [];
+if (authorName) metaParts.push(`Shot by ${authorName}`);
+if (formattedDate) metaParts.push(`on ${formattedDate}`);
+if (categoryName) metaParts.push(`in ${categoryName}`);
+const metaText = metaParts.join(' ');
+
+// 处理目录树
 const tocEntries = (toc ?? [])
-	.map((item) => ({
-		...item,
-		level:
-			Number.isInteger(item.level) && item.level >= 2 && item.level <= 4
-				? item.level
-				: 2,
-		text: item.text.trim(),
-	}))
-	.filter((item) => item.id && item.text);
+  .map((item) => ({
+    ...item,
+    level:
+      Number.isInteger(item.level) && item.level >= 2 && item.level <= 4
+        ? item.level
+        : 2,
+    text: item.text.trim(),
+  }))
+  .filter((item) => item.id && item.text);
 const hasToc = tocEntries.length > 0;
 ---
 
 <Base
-	title={title}
-	description={description}
-	image={image}
-	canonicalUrl={canonicalUrl}
-	backgroundOverride={backgroundOverride}
+  title={title}
+  description={description}
+  image={image}
+  canonicalUrl={canonicalUrl}
+  backgroundOverride={backgroundOverride}
 >
-	<article class="article-shell story-article">
-		<!-- ⭐ 文章头部：标题、元信息 -->
-		<header class="article-header">
-			<h1 class="article-title">{title}</h1>
-			{description && <p class="article-summary">{description}</p>}
-			<div class="article-meta">
-				{formattedDate && (
-					<time class="meta-item" datetime={publishedAt}>
-						📅 {formattedDate}
-					</time>
-				)}
-				{authorName && <span class="meta-item">✍️ {authorName}</span>}
-				{categoryName && <span class="meta-item">📂 {categoryName}</span>}
-				<span class="meta-item">📖 {articleLengthLabel}</span>
-				<span class="meta-item">⏱️ {articleReadingTimeLabel}</span>
-			</div>
-		</header>
+  <article class="article-shell story-article">
+    <!-- ⭐ 文章头部：标题、元信息 -->
+    <header class="article-header">
+      <h1 class="article-title">{title}</h1>
+      {description && <p class="article-summary">{description}</p>}
+      <div class="article-meta">
+        {metaText && <span class="meta-item">{metaText}</span>}
+      </div>
+    </header>
 
-		<!-- ⭐ 文章正文 -->
-		<div class="article-body">
-			<div class="prose article-prose">
-				<slot />
-			</div>
-		</div>
+    <!-- ⭐ 文章正文 -->
+    <div class="article-body">
+      <div class="prose article-prose">
+        <slot />
+      </div>
+    </div>
 
-		<!-- ⭐ Story 风格目录树（折叠在底部） -->
-		{hasToc && (
-			<div class="story-toc-wrapper">
-				<button
-					type="button"
-					class="story-toc-toggle"
-					id="storyTocToggle"
-					aria-expanded="false"
-				>
-					📑 目录
-				</button>
-				<nav class="story-toc-panel" id="storyTocPanel" style="display: none;">
-					<ol class="story-toc-list">
-						{tocEntries.map((item) => (
-							<li class={`story-toc-item level-${item.level}`}>
-								<a href={`#${item.id}`} class="story-toc-link">
-									{item.text}
-								</a>
-							</li>
-						))}
-					</ol>
-				</nav>
-			</div>
-		)}
+    <!-- ⭐ Story 风格目录树（折叠在底部） -->
+    {hasToc && (
+      <div class="story-toc-wrapper">
+        <button
+          type="button"
+          class="story-toc-toggle"
+          id="storyTocToggle"
+          aria-expanded="false"
+        >
+          📑 目录
+        </button>
+        <nav class="story-toc-panel" id="storyTocPanel" style="display: none;">
+          <ol class="story-toc-list">
+            {tocEntries.map((item) => (
+              <li class={`story-toc-item level-${item.level}`}>
+                <a href={`#${item.id}`} class="story-toc-link">
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </div>
+    )}
 
-		<!-- ⭐ 评论 -->
-		<div class="article-comments">
-			<CommentsPanel />
-		</div>
+    <!-- ⭐ 评论 -->
+    <div class="article-comments">
+      <CommentsPanel />
+    </div>
 
-		<!-- ⭐ 底部导航（返回归档、回到顶部） -->
-		<div class="article-footer-nav">
-			<a href="/blog" class="nav-link">← 返回归档</a>
-			<a href="#top" class="nav-link">↑ 回到顶部</a>
-		</div>
-	</article>
+    <!-- ⭐ 底部导航（返回归档、回到顶部） -->
+    <div class="article-footer-nav">
+      <a href="/blog" class="nav-link">← 返回归档</a>
+      <a href="#top" class="nav-link">↑ 回到顶部</a>
+    </div>
+  </article>
 
-	<!-- ⭐ 目录切换脚本 -->
-	<script is:inline>
-		document.addEventListener('DOMContentLoaded', function() {
-			const toggle = document.getElementById('storyTocToggle');
-			const panel = document.getElementById('storyTocPanel');
-			if (toggle && panel) {
-				toggle.addEventListener('click', function() {
-					const isOpen = panel.style.display === 'block';
-					panel.style.display = isOpen ? 'none' : 'block';
-					toggle.setAttribute('aria-expanded', !isOpen);
-				});
-			}
-		});
-	</script>
+  <!-- ⭐ 目录切换脚本 -->
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggle = document.getElementById('storyTocToggle');
+      const panel = document.getElementById('storyTocPanel');
+      if (toggle && panel) {
+        toggle.addEventListener('click', function() {
+          const isOpen = panel.style.display === 'block';
+          panel.style.display = isOpen ? 'none' : 'block';
+          toggle.setAttribute('aria-expanded', !isOpen);
+        });
+      }
+    });
+  </script>
 </Base>
