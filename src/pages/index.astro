@@ -10,7 +10,6 @@ import { getPublicPostVisibilityCondition } from "@/lib/public-content";
 import {
   DEFAULT_SITE_APPEARANCE,
   getSiteAppearance,
-  resolveSiteDescriptionFromAppearance,
 } from "@/lib/site-appearance";
 import { siteConfig } from "@/lib/types";
 
@@ -25,15 +24,15 @@ interface HomePostCardRow {
   featuredImageAlt: string | null;
 }
 
+// ---------- 分页参数 ----------
+const currentPage = Number(Astro.url.searchParams.get("page")) || 1;
+const limit = 4;
+const offset = (currentPage - 1) * limit;
+
 let pinnedPosts: HomePostCardRow[] = [];
 let recentPosts: HomePostCardRow[] = [];
 let homepageAppearance = DEFAULT_SITE_APPEARANCE;
 let totalPages = 0;
-
-// ---------- 分页参数 ----------
-const currentPage = Number(Astro.url.searchParams.get("page")) || 1;
-const limit = 10; // 每页文章数
-const offset = (currentPage - 1) * limit;
 
 function toHomePostCardRow(row: {
   title: string;
@@ -63,7 +62,7 @@ try {
   const db = getDb(env.DB);
   homepageAppearance = await getSiteAppearance(db);
 
-  // ---- 1. 查询置顶文章（不分页，始终显示） ----
+  // ---- 置顶文章（不分页） ----
   const pinnedRows = await db
     .select({
       title: blogPosts.title,
@@ -89,7 +88,7 @@ try {
     .limit(6);
   pinnedPosts = pinnedRows.map(toHomePostCardRow);
 
-  // ---- 2. 统计非置顶文章总数（用于分页） ----
+  // ---- 统计非置顶总数 ----
   const countResult = await db
     .select({ count: sql<number>`count(*)` })
     .from(blogPosts)
@@ -99,12 +98,7 @@ try {
   const totalNonPinned = countResult[0]?.count || 0;
   totalPages = Math.ceil(totalNonPinned / limit);
 
-  // 如果当前页码超出总页数，重定向到最后一页（或首页）
-  if (totalPages > 0 && currentPage > totalPages) {
-    return Astro.redirect(`/?page=${totalPages}`);
-  }
-
-  // ---- 3. 查询当前页的非置顶文章 ----
+  // ---- 当前页的非置顶文章 ----
   const recentRows = await db
     .select({
       title: blogPosts.title,
@@ -127,13 +121,51 @@ try {
     .offset(offset);
   recentPosts = recentRows.map(toHomePostCardRow);
 } catch {
-  // D1 未绑定时降级为空列表
+  // D1 未绑定时降级为空
+}
+
+// ---- 页码重定向（防止超出范围） ----
+if (totalPages > 0 && currentPage > totalPages) {
+  return Astro.redirect(`/?page=${totalPages}`);
+}
+
+// ---- 生成分页导航数据（在模板外处理，避免模板内出现 if） ----
+type PageItem = 
+  | { type: 'ellipsis'; key: string }
+  | { type: 'link' | 'current'; key: string; label: string; href: string };
+
+let pageItems: PageItem[] = [];
+if (totalPages > 1) {
+  const range = 2;
+  const pages: (number | 'ellipsis')[] = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (
+      i === 1 ||
+      i === totalPages ||
+      (i >= currentPage - range && i <= currentPage + range)
+    ) {
+      pages.push(i);
+    } else if (pages[pages.length - 1] !== 'ellipsis') {
+      pages.push('ellipsis');
+    }
+  }
+
+  pageItems = pages.map((p) => {
+    if (p === 'ellipsis') {
+      return { type: 'ellipsis', key: `ellipsis-${Date.now()}-${Math.random()}` };
+    }
+    const isCurrent = p === currentPage;
+    return {
+      type: isCurrent ? 'current' : 'link',
+      key: `page-${p}`,
+      label: String(p),
+      href: `?page=${p}`,
+    };
+  });
 }
 
 const allPosts = [...pinnedPosts, ...recentPosts];
 const hasPosts = allPosts.length > 0;
-// 确保 currentPage 有效（至少为 1）
-const validPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
 ---
 
 <Base title={siteConfig.name} description={siteConfig.description}>
@@ -175,40 +207,27 @@ const validPage = totalPages > 0 ? Math.min(currentPage, totalPages) : 1;
           <ol class="page-navigator">
             <!-- 上一页 -->
             {currentPage > 1 && (
-              <li>
-                <a href={`?page=${currentPage - 1}`}>«</a>
-              </li>
+              <li><a href={`?page=${currentPage - 1}`}>«</a></li>
             )}
 
-            <!-- 生成页码列表（显示当前页前后各2页，并包含首尾页） -->
-            {Array.from({ length: totalPages }, (_, i) => i + 1)
-              .filter(
-                (p) =>
-                  Math.abs(p - currentPage) <= 2 ||
-                  p === 1 ||
-                  p === totalPages
+            <!-- 页码 + 省略号（全部用三元表达式） -->
+            {pageItems.map((item) =>
+              item.type === 'ellipsis' ? (
+                <li key={item.key}><span>…</span></li>
+              ) : item.type === 'current' ? (
+                <li key={item.key} class="current">
+                  <a href={item.href}>{item.label}</a>
+                </li>
+              ) : (
+                <li key={item.key}>
+                  <a href={item.href}>{item.label}</a>
+                </li>
               )
-              .map((p, index, arr) => {
-                // 若与前一项断层，插入省略号
-                if (index > 0 && arr[index - 1] !== p - 1) {
-                  return (
-                    <li key={`ellipsis-${p}`}>
-                      <span>…</span>
-                    </li>
-                  );
-                }
-                return (
-                  <li key={p} class={p === currentPage ? "current" : ""}>
-                    <a href={`?page=${p}`}>{p}</a>
-                  </li>
-                );
-              })}
+            )}
 
             <!-- 下一页 -->
             {currentPage < totalPages && (
-              <li>
-                <a href={`?page=${currentPage + 1}`}>»</a>
-              </li>
+              <li><a href={`?page=${currentPage + 1}`}>»</a></li>
             )}
           </ol>
         </div>
