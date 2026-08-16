@@ -1,6 +1,7 @@
 // @ts-check
 import cloudflare from "@astrojs/cloudflare";
 import { defineConfig } from "astro/config";
+import swup from '@swup/astro';
 
 export default defineConfig({
 	output: "server",
@@ -12,7 +13,7 @@ export default defineConfig({
 			enabled: true,
 		},
 	}),
-	site: "https://blog.ericterminal.com",
+	site: "https://film.lkin.cn",
 	vite: {
 		resolve: {
 			alias: {
@@ -20,4 +21,7 @@ export default defineConfig({
 			},
 		},
 	},
+	integrations: [
+		swup(),
+	],
 });
