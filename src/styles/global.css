@@ -13,6 +13,7 @@
 @media (min-width: 640px) {
   .post-list {
     grid-template-columns: repeat(2, 1fr);
+    max-width: 640px;
   }
 }
 
@@ -20,6 +21,7 @@
 @media (min-width: 920px) {
   .post-list {
     grid-template-columns: repeat(3, 1fr);
+    max-width: 920px;
   }
 }
 
@@ -27,6 +29,7 @@
 @media (min-width: 1300px) {
   .post-list {
     grid-template-columns: repeat(4, 1fr);
+    max-width: 1300px;
   }
 }
 
