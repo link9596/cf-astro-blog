@@ -5,7 +5,7 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
 	output: "server",
 	prefetch: {
-		prefetchAll: true,
+		prefetchAll: false,
 		defaultStrategy: "hover",
 	},
 	adapter: cloudflare({
