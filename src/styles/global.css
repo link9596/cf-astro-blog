@@ -427,9 +427,8 @@ body {
         font-family: var(--font-serif-body);
         font-weight: 400;
         line-height: 1.75;
+        background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center/cover no-repeat;
 }
-
-body::before{ background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center/cover no-repeat; } blockquote::before{ background: transparent !important; }
 
 /* ---------- 分页器容器 ---------- */
 .nav-page {
