@@ -431,25 +431,69 @@ body {
 
 body::before{ background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center/cover no-repeat; } blockquote::before{ background: transparent !important; }
 
+/* ---------- 分页器容器 ---------- */
+.nav-page {
+  display: flex;
+  justify-content: center;  /* 水平居中 */
+  margin-top: 30px;         /* 与上方内容的间距，可按需调整 */
+}
+
+/* ---------- 分页列表 ---------- */
 .page-navigator {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: center;
+  flex-wrap: nowrap;        /* 强制一行 */
   align-items: center;
   list-style: none;
   padding: 0;
   margin: 0;
-  gap: 8px;
+  gap: 6px;                /* 项间距 */
 }
 
+/* ---------- 每个分页项 ---------- */
 .page-navigator li {
   display: inline-block;
+  min-width: 30px;          /* 保证数字按钮宽度一致 */
+  height: 30px;
+  text-align: center;
+  line-height: 30px;        /* 垂直居中文字 */
+  color: #414141;
+  font-size: 14px;
 }
 
+/* ---------- 链接和纯文本（省略号） ---------- */
 .page-navigator a,
 .page-navigator span {
   display: block;
-  padding: 6px 12px;
+  padding: 0 6px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+/* ---------- Hover 特效（微透明背景） ---------- */
+.page-navigator a:hover,
+.page-navigator span:hover {
+  background-color: rgba(0, 0, 0, 0.08);  /* 微微半透明 */
+}
+
+/* ---------- 当前页（高亮） ---------- */
+.page-navigator .current a,
+.page-navigator .current span {
+  background-color: #ff5252cc;  /* 你的主题色 */
+  color: #fff;
+  border-radius: 4px;
+}
+/* 当前页 hover 不变（可选） */
+.page-navigator .current a:hover,
+.page-navigator .current span:hover {
+  background-color: #ff5252cc;  /* 或加深一点 */
+}
+
+/* ---------- 上一页/下一页箭头 ---------- */
+.page-navigator li:first-child a,
+.page-navigator li:last-child a {
+  padding: 0 10px;          /* 箭头区域稍宽 */
 }
 
 .site-route-frame {
