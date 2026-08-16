@@ -430,6 +430,19 @@ body {
         background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center/cover no-repeat;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  z-index: -1;
+  background: url(https://demo.atlinker.cn/PHOTO/usr/themes/Story/bkg.png) center / cover no-repeat;
+  opacity: 0.6;
+}
+
 /* ---------- 分页器容器 ---------- */
 .nav-page {
   display: flex;
