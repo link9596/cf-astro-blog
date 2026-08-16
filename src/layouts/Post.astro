@@ -82,13 +82,6 @@ const articleLengthLabel =
   countLabelParts.length > 0 ? countLabelParts.join(" / ") : "0 字";
 const articleReadingTimeLabel = `约 ${safeEstimatedReadingMinutes.toLocaleString("zh-CN")} 分钟`;
 
-// ⭐ 修改：构建元数据句子
-let metaParts: string[] = [];
-if (authorName) metaParts.push(`Shot by ${authorName}`);
-if (formattedDate) metaParts.push(`on ${formattedDate}`);
-if (categoryName) metaParts.push(`in ${categoryName}`);
-const metaText = metaParts.join(' ');
-
 // 处理目录树
 const tocEntries = (toc ?? [])
   .map((item) => ({
@@ -116,7 +109,17 @@ const hasToc = tocEntries.length > 0;
       <h1 class="article-title">{title}</h1>
       {description && <p class="article-summary">{description}</p>}
       <div class="article-meta">
-        {metaText && <span class="meta-item">{metaText}</span>}
+        {authorName && (
+          <span class="meta-item">
+            Shot by <span style="color: #ff5252cc;">{authorName}</span>
+          </span>
+        )}
+        {formattedDate && <span class="meta-item">on {formattedDate}</span>}
+        {categoryName && (
+          <span class="meta-item">
+            in <span style="color: #ff5252cc;">{categoryName}</span>
+          </span>
+        )}
       </div>
     </header>
 
