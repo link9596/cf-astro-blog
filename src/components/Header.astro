@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/types";
 
 <style>
   .site-header {
-    padding: 30px 30px 30px 30px;
+    padding: 30px;
     background: transparent;
     position: relative;
   }
@@ -41,6 +41,7 @@ import { siteConfig } from "@/lib/types";
     transition: background 0.2s, color 0.2s;
     user-select: none;
     cursor: default;
+    flex-shrink: 0; /* 防止被压缩 */
   }
 
   /* L 特殊：默认白色背景，深色文字 */
@@ -63,14 +64,20 @@ import { siteConfig } from "@/lib/types";
     background-color: #555;
   }
 
-  /* 隐藏的额外方块 */
+  /* ---------- 额外方块：动画显隐 ---------- */
   .block-item.extra {
-    display: none;
+    display: flex;              /* 始终 flex，通过 width/opacity 控制显隐 */
+    width: 0;
+    opacity: 0;
+    overflow: hidden;          /* 隐藏溢出的文字 */
+    transition: width 0.3s ease, opacity 0.3s ease;
     cursor: pointer;
     font-size: 16px;
+    flex-shrink: 0;
   }
   .block-item.extra.visible {
-    display: flex;
+    width: 28px;
+    opacity: 1;
   }
   .block-item.extra:hover {
     background-color: #555;
@@ -78,7 +85,7 @@ import { siteConfig } from "@/lib/types";
 
   /* ---------- 下方弹出容器 ---------- */
   .dropdown-block {
-    display: block;                    /* 始终块级，但通过 max-height 控制显示 */
+    display: block;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease, opacity 0.3s ease;
@@ -91,7 +98,7 @@ import { siteConfig } from "@/lib/types";
     min-width: 100%;
   }
   .dropdown-block.open {
-    max-height: 300px;                /* 足够容纳所有项，可根据实际高度调整 */
+    max-height: 300px;
     opacity: 1;
   }
 
@@ -137,9 +144,9 @@ import { siteConfig } from "@/lib/types";
 
   /* 响应式 */
   @media (max-width: 768px) {
-  .site-header {
-    padding: 30px 16px 30px 16px;
-  }
+    .site-header {
+      padding: 30px 16px 30px 16px;
+    }
   }
 </style>
 
