@@ -51,10 +51,10 @@
 }
 
 .article-title {
-	font-size: clamp(2rem, 2.5vw, 3.2rem);
+	font-size: 2.3rem;
 	line-height: 1.15;
 	font-weight: 700;
-	color: #1a1a1a;
+	color: #414141;
 	margin-bottom: 0.75rem;
 }
 
@@ -85,7 +85,7 @@
 .article-prose {
 	font-size: 1.05rem;
 	line-height: 1.9;
-	color: #2c3e50;
+	color: var(--color-main-text);
 }
 
 .article-prose :global(h2) {
@@ -93,7 +93,7 @@
 	margin-top: 2.2rem;
 	margin-bottom: 0.8rem;
 	font-weight: 600;
-	color: #1a1a1a;
+	color: #414141;
 }
 
 .article-prose :global(h3) {
@@ -101,7 +101,7 @@
 	margin-top: 1.8rem;
 	margin-bottom: 0.6rem;
 	font-weight: 600;
-	color: #1a1a1a;
+	color: #414141;
 }
 
 .article-prose :global(h4) {
@@ -109,7 +109,7 @@
 	margin-top: 1.4rem;
 	margin-bottom: 0.5rem;
 	font-weight: 600;
-	color: #1a1a1a;
+	color: #414141;
 }
 
 .article-prose :global(p) {
@@ -257,7 +257,7 @@
 	--color-bg: #fff;
 	--color-bg-secondary: rgba(255, 255, 255, 0.34);
 	--color-bg-tertiary: rgba(255, 255, 255, 0.22);
-	--color-footer-text: #272727;
+	--color-main-text: #383838;
 	--color-surface-elevated: rgba(255, 255, 255, 0.6);
 	--color-text: #101828;
 	--color-text-secondary: #3a4357;
@@ -339,7 +339,7 @@
 [data-theme="dark"] {
 	--color-bg: #1e1e1e;
 	--color-bg-secondary: rgba(12, 22, 35, 0.38);
-	--color-footer-text: #ddd;
+	--color-main-text: #ddd;
 	--color-bg-tertiary: rgba(16, 28, 44, 0.24);
 	--color-surface-elevated: rgba(15, 27, 43, 0.52);
 	--color-text: #eef4ff;
@@ -371,7 +371,7 @@
 		--color-bg: #1e1e1e;
 		--color-bg-secondary: rgba(13, 24, 40, 0.7);
 		--color-bg-tertiary: rgba(15, 27, 44, 0.82);
-		--color-footer-text: #ddd;
+		--color-main-text: #ddd;
 		--color-surface-elevated: rgba(17, 29, 48, 0.92);
 		--color-text: #eef4ff;
 		--color-text-secondary: #cad4e6;

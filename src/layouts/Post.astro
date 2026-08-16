@@ -57,7 +57,6 @@ const sidebarBadge = articleSidebarBadge?.trim() || "文章作者";
 const sidebarBio = articleSidebarBio?.trim() || "在这里记录技术、生活和折腾。";
 const sidebarAvatarInitial = sidebarName.slice(0, 1).toUpperCase();
 
-// 字数/阅读时间依然计算（可能其他地方使用），但不再显示在 meta 中
 const safeCjkCharCount =
   Number.isFinite(cjkCharCount) && Number(cjkCharCount) > 0
     ? Math.trunc(Number(cjkCharCount))
@@ -82,7 +81,6 @@ const articleLengthLabel =
   countLabelParts.length > 0 ? countLabelParts.join(" / ") : "0 字";
 const articleReadingTimeLabel = `约 ${safeEstimatedReadingMinutes.toLocaleString("zh-CN")} 分钟`;
 
-// 处理目录树
 const tocEntries = (toc ?? [])
   .map((item) => ({
     ...item,
@@ -104,33 +102,32 @@ const hasToc = tocEntries.length > 0;
   backgroundOverride={backgroundOverride}
 >
   <article class="article-shell story-article">
-    <!-- ⭐ 文章头部：标题、元信息 -->
     <header class="article-header">
       <h1 class="article-title">{title}</h1>
       {description && <p class="article-summary">{description}</p>}
+
+      <!-- ✅ 修复：整个元数据放在一个 span 中，确保一行 -->
       <div class="article-meta">
-        {authorName && (
-          <span class="meta-item">
-            Shot by <span style="color: #ff5252cc;">{authorName}</span>
-          </span>
-        )}
-        {formattedDate && <span class="meta-item">on {formattedDate}</span>}
-        {categoryName && (
-          <span class="meta-item">
-            in <span style="color: #ff5252cc;">{categoryName}</span>
-          </span>
-        )}
+        <span class="meta-item">
+          {authorName && (
+            <>Shot by <span style="color: #ff5252cc;">{authorName}</span></>
+          )}
+          {formattedDate && (
+            <>{authorName ? ' ' : ''}on {formattedDate}</>
+          )}
+          {categoryName && (
+            <>{ (authorName || formattedDate) ? ' ' : '' }in <span style="color: #ff5252cc;">{categoryName}</span></>
+          )}
+        </span>
       </div>
     </header>
 
-    <!-- ⭐ 文章正文 -->
     <div class="article-body">
       <div class="prose article-prose">
         <slot />
       </div>
     </div>
 
-    <!-- ⭐ Story 风格目录树（折叠在底部） -->
     {hasToc && (
       <div class="story-toc-wrapper">
         <button
@@ -155,19 +152,16 @@ const hasToc = tocEntries.length > 0;
       </div>
     )}
 
-    <!-- ⭐ 评论 -->
     <div class="article-comments">
       <CommentsPanel />
     </div>
 
-    <!-- ⭐ 底部导航（返回归档、回到顶部） -->
     <div class="article-footer-nav">
       <a href="/blog" class="nav-link">← 返回归档</a>
       <a href="#top" class="nav-link">↑ 回到顶部</a>
     </div>
   </article>
 
-  <!-- ⭐ 目录切换脚本 -->
   <script is:inline>
     document.addEventListener('DOMContentLoaded', function() {
       const toggle = document.getElementById('storyTocToggle');
