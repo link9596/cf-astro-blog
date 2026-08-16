@@ -60,7 +60,7 @@ const displayCategory = categoryName || "未分类";
 </article>
 
 <style is:global>
-	/* ⭐ 外面边框容器 - 正方形，4px #414141 边框，无 padding */
+
 	.post-item {
 		position: relative;
 		display: block;
@@ -117,7 +117,7 @@ const displayCategory = categoryName || "未分类";
 		top: 0;
 		left: 0;
 		background: #414141;
-		padding: 5px 12px 5px 12px;
+		padding: 5px 12px;
 		font-family: 'Josefin Sans', -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", STHeiti, "Microsoft Yahei", "WenQuanYi Micro Hei", Arial, Verdana, sans-serif;
 		font-size: 14px;
 		font-weight: 700;
@@ -150,7 +150,6 @@ const displayCategory = categoryName || "未分类";
 		backdrop-filter: saturate(180%) blur(20px);
 		will-change: transform;
 		transform: translateZ(0);
-		transform: translate3d(0, 0, 0);
 		z-index: 2;
 		max-width: calc(100% - 40px);
 	}
