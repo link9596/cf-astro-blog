@@ -436,3 +436,17 @@ body {
 }
 
 body::before{ background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) center/cover no-repeat; } blockquote::before{ background: transparent !important; }
+
+.site-route-frame {
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-main {
+  flex: 1 0 auto;
+}
+
+.site-footer {
+  flex-shrink: 0;
+}
