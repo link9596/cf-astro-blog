@@ -22,6 +22,8 @@ export default defineConfig({
 		},
 	},
 	integrations: [
-		swup(),
+		swup({
+      containers: ['main'],
+    }),
 	],
 });
