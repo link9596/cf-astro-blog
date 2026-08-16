@@ -4,7 +4,7 @@ import { siteConfig } from "@/lib/types";
 
 <style>
   .site-header {
-    padding: 20px 30px 30px 30px;
+    padding: 30px 30px 30px 30px;
     background: transparent;
     position: relative;
   }
@@ -21,7 +21,7 @@ import { siteConfig } from "@/lib/types";
   .logo-block {
     display: flex;
     align-items: center;
-    gap: 0; /* 无间距 */
+    gap: 0;
     flex-wrap: wrap;
   }
 
@@ -38,17 +38,20 @@ import { siteConfig } from "@/lib/types";
     font-weight: 700;
     font-family: 'Georgia', serif;
     text-decoration: none;
-    transition: background 0.2s, opacity 0.2s;
+    transition: background 0.2s, color 0.2s;
     user-select: none;
     cursor: default;
   }
 
+  /* L 特殊：默认白色背景，深色文字 */
   .block-item.brand-link {
+    background-color: #fff;
+    color: #414141;
     cursor: pointer;
   }
   .block-item.brand-link:hover {
-    background-color: #fff;
-    color: #414141;
+    background-color: #414141;
+    color: #fff;
   }
 
   .block-item.menu-toggle {
@@ -75,23 +78,24 @@ import { siteConfig } from "@/lib/types";
 
   /* ---------- 下方弹出容器 ---------- */
   .dropdown-block {
-    display: none;          /* 默认隐藏 */
-    flex-direction: column; /* 纵向排列子项 */
-    align-items: stretch;
-    background: transparent; /* 本身透明，子项自己背景 */
-    gap: 0;                /* 无间距 */
+    display: block;                    /* 始终块级，但通过 max-height 控制显示 */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    background: transparent;
     position: absolute;
     top: 100%;
     left: 0;
-    margin-top: 0;
     z-index: 10;
-    min-width: 100%;        /* 与父容器同宽 */
+    min-width: 100%;
   }
   .dropdown-block.open {
-    display: flex;
+    max-height: 300px;                /* 足够容纳所有项，可根据实际高度调整 */
+    opacity: 1;
   }
 
-  /* 每个下拉项（链接或输入框） */
+  /* 下拉项（链接或输入框） */
   .dropdown-item {
     display: flex;
     align-items: center;
@@ -104,19 +108,20 @@ import { siteConfig } from "@/lib/types";
     text-decoration: none;
     white-space: nowrap;
     transition: background 0.2s;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
   }
   .dropdown-item:hover {
-    background-color: #555;   /* 悬停变亮 */
+    background-color: #555;
   }
-  /* 搜索输入框特殊处理 */
   .dropdown-item.search-input {
-    background-color: #414141;
-    border: none;
-    outline: none;
-    color: #fff;
-    width: 80px;             /* 固定宽度 */
+    width: 80px;
     padding: 0 8px;
     text-align: left;
+    color: #fff;
+    background-color: #414141;
+    outline: none;
   }
   .dropdown-item.search-input::placeholder {
     color: #aaa;
@@ -128,6 +133,13 @@ import { siteConfig } from "@/lib/types";
     flex-direction: column;
     align-items: center;
     position: relative;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+  .site-header {
+    padding: 30px 16px 30px 16px;
+  }
   }
 </style>
 
@@ -152,7 +164,6 @@ import { siteConfig } from "@/lib/types";
         <!-- 额外方块：搜索 (🔍) -->
         <div class="block-wrapper" id="searchWrapper">
           <span class="block-item extra" id="searchBtn">🔍</span>
-          <!-- 搜索框下拉 -->
           <div class="dropdown-block" id="searchDropdown">
             <input type="text" class="dropdown-item search-input" placeholder="搜索~" />
           </div>
@@ -161,17 +172,15 @@ import { siteConfig } from "@/lib/types";
         <!-- 额外方块：页面菜单 (🌳) -->
         <div class="block-wrapper" id="treeWrapper">
           <span class="block-item extra" id="treeBtn">🌳</span>
-          <!-- 页面链接下拉 -->
           <div class="dropdown-block" id="treeDropdown">
             <a href="/about" class="dropdown-item">关于</a>
             <a href="/blog" class="dropdown-item">归档</a>
             <a href="/contact" class="dropdown-item">联系</a>
-            <!-- 可添加更多页面 -->
           </div>
         </div>
       </div>
 
-      <!-- 右侧占位（保持原布局） -->
+      <!-- 右侧占位 -->
       <div class="header-right"></div>
     </div>
   </div>
@@ -182,39 +191,33 @@ import { siteConfig } from "@/lib/types";
     const toggleBtn = document.getElementById('menuToggle');
     const searchBtn = document.getElementById('searchBtn');
     const treeBtn = document.getElementById('treeBtn');
-    const searchWrapper = document.getElementById('searchWrapper');
-    const treeWrapper = document.getElementById('treeWrapper');
     const searchDropdown = document.getElementById('searchDropdown');
     const treeDropdown = document.getElementById('treeDropdown');
 
     let extrasVisible = false;
 
-    // 点击 ≡ 切换显示额外方块
     toggleBtn.addEventListener('click', function (e) {
       e.preventDefault();
       extrasVisible = !extrasVisible;
       searchBtn.classList.toggle('visible', extrasVisible);
       treeBtn.classList.toggle('visible', extrasVisible);
-      // 同时隐藏所有下拉
+      // 关闭下拉
       searchDropdown.classList.remove('open');
       treeDropdown.classList.remove('open');
     });
 
-    // 点击搜索方块切换搜索下拉
     searchBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       searchDropdown.classList.toggle('open');
       treeDropdown.classList.remove('open');
     });
 
-    // 点击树形方块切换页面菜单下拉
     treeBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       treeDropdown.classList.toggle('open');
       searchDropdown.classList.remove('open');
     });
 
-    // 点击页面其他区域关闭所有下拉
     document.addEventListener('click', function (e) {
       if (!e.target.closest('.logo-block')) {
         searchDropdown.classList.remove('open');
