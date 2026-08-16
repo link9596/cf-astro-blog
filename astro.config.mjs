@@ -6,7 +6,6 @@ export default defineConfig({
 	output: "server",
 	prefetch: {
 		prefetchAll: false,
-		defaultStrategy: "hover",
 	},
 	adapter: cloudflare({
 		platformProxy: {
