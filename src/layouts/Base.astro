@@ -95,7 +95,6 @@ const backgroundImageUrl = buildBackgroundImageUrl(resolvedBackgroundImageKey);
 const backgroundImageStyle = backgroundImageUrl
 	? `--bg-focus-x: ${resolvedBackgroundPositionX}; --bg-focus-y: ${resolvedBackgroundPositionY}; --bg-blur: ${resolvedBackgroundBlur}px; --bg-scale: ${resolvedBackgroundScale / 100}; --bg-opacity: ${resolvedBackgroundOpacity / 100};`
 	: "";
-// ⭐ 修改：Story 主题不使用毛玻璃透明度，重置为不透明
 const surfaceStyle = `--hero-card-opacity: 1; --hero-card-blur: 0px; --post-card-opacity: 1; --post-card-blur: 0px; --article-panel-opacity: 1; --article-panel-blur: 0px;`;
 const resolvedDescription =
 	description ??
@@ -123,12 +122,11 @@ const resolvedDescription =
 	<body
 		class:list={[
 			"site-shell",
-			// ⭐ 修改：不启用背景图（Story 风格纯白背景）
 			// { "site-shell-has-background-image": Boolean(backgroundImageUrl) },
 		]}
 		style={surfaceStyle}
 	>
-		<!-- ⭐ 修改：移除背景图层，Story 不需要 -->
+
 		<!-- <div class="site-background" aria-hidden="true"> ... </div> -->
 		
 		<Header siteAppearance={siteAppearance} />
@@ -154,13 +152,7 @@ const resolvedDescription =
 	.glass-panel::after {
 		display: none !important;
 	}
-	/* 重置 body 背景为白色 */
-	body {
-		background: #f8f9fa !important;
-	}
-	.site-shell {
-		background: #f8f9fa !important;
-	}
+
 	/* 容器宽度适配 Story 风格 */
 	.container {
 		margin:0 auto;
