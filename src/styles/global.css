@@ -259,6 +259,7 @@
 	--color-bg: #fff;
 	--color-bg-secondary: rgba(255, 255, 255, 0.34);
 	--color-bg-tertiary: rgba(255, 255, 255, 0.22);
+	--color-footer-text: #272727;
 	--color-surface-elevated: rgba(255, 255, 255, 0.6);
 	--color-text: #101828;
 	--color-text-secondary: #3a4357;
@@ -273,12 +274,12 @@
 	--font-sans:
 		'Josefin Sans', -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB",
 		"Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-	--font-serif-body: "Lora Variable", "LXGW WenKai", "Shippori Mincho", serif;
+	--font-serif-body: 'Josefin Sans', -apple-system, BlinkMacSystemFont, "Lora Variable", "LXGW WenKai", "Shippori Mincho", serif;
 	--font-serif-em:
-		"Cormorant Garamond", "LXGW WenKai", "Shippori Mincho", serif;
-	--font-strong: "Space Grotesk", "LXGW WenKai", "Shippori Mincho", sans-serif;
+		'Josefin Sans', -apple-system, BlinkMacSystemFont, "Cormorant Garamond", "LXGW WenKai", "Shippori Mincho", serif;
+	--font-strong: 'Josefin Sans', -apple-system, BlinkMacSystemFont, "Space Grotesk", "LXGW WenKai", "Shippori Mincho", sans-serif;
 	--font-mono:
-		"SF Mono", "JetBrains Mono", "Cascadia Code", "Menlo", "Consolas", monospace;
+		'Josefin Sans', -apple-system, BlinkMacSystemFont, "SF Mono", "JetBrains Mono", "Cascadia Code", "Menlo", "Consolas", monospace;
 	--font-size-sm: 0.92rem;
 	--font-size-base: 1rem;
 	--font-size-lg: 1.12rem;
@@ -340,6 +341,7 @@
 [data-theme="dark"] {
 	--color-bg: #1e1e1e;
 	--color-bg-secondary: rgba(12, 22, 35, 0.38);
+	--color-footer-text: #ddd;
 	--color-bg-tertiary: rgba(16, 28, 44, 0.24);
 	--color-surface-elevated: rgba(15, 27, 43, 0.52);
 	--color-text: #eef4ff;
@@ -371,6 +373,7 @@
 		--color-bg: #1e1e1e;
 		--color-bg-secondary: rgba(13, 24, 40, 0.7);
 		--color-bg-tertiary: rgba(15, 27, 44, 0.82);
+		--color-footer-text: #ddd;
 		--color-surface-elevated: rgba(17, 29, 48, 0.92);
 		--color-text: #eef4ff;
 		--color-text-secondary: #cad4e6;
@@ -468,7 +471,7 @@ content: '';
 .nav-page {
   display: flex;
   justify-content: center;  /* 水平居中 */
-  margin-top: 30px;         /* 与上方内容的间距，可按需调整 */
+  margin-top: 100px;         /* 与上方内容的间距，可按需调整 */
 }
 
 /* ---------- 分页列表 ---------- */
