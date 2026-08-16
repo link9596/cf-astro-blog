@@ -1,236 +1,202 @@
 ---
 import { siteConfig } from "@/lib/types";
 ---
+
 <style>
-	.site-header {
-		padding: 20px 30px 30px 30px;
-		background: transparent;
-	}
+  .site-header {
+    padding: 20px 30px 30px 30px;
+    background: transparent;
+    position: relative; /* 为下拉面板定位 */
+  }
 
-	.header-inner {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		flex-wrap: wrap;
-		gap: 0.8rem;
-	}
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
 
-	.logo {
-		display: flex;
-		align-items: center;
-		gap: 0.15rem;
-		font-size: 1.8rem;
-		font-weight: 700;
-		letter-spacing: 0.1em;
-		font-family: 'Georgia', serif;
-	}
+  /* ---------- 方块导航 ---------- */
+  .logo-block {
+    display: flex;
+    align-items: center;
+    gap: 0; /* 无间距 */
+  }
 
-	.letter {
-		color: #2c3e50;
-		transition: color 0.2s;
-	}
+  .block-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 26px;
+    background-color: #414141;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Georgia', serif;
+    text-decoration: none;
+    transition: background 0.2s, opacity 0.2s;
+    cursor: default;
+    user-select: none;
+  }
 
-	.brand-link {
-		text-decoration: none;
-	}
+  .block-item.brand-link {
+    cursor: pointer;
+  }
 
-	.brand-letter {
-		color: #3498db;
-	}
+  .block-item.brand-link:hover {
+    background-color: #3498db; /* 悬停高亮，可自定义 */
+  }
 
-	.letter:hover {
-		color: #3498db;
-	}
+  /* 第六个方块 - 汉堡菜单按钮 */
+  .block-item.menu-toggle {
+    cursor: pointer;
+    background-color: #414141;
+    font-size: 18px;
+    font-weight: 400;
+  }
 
-	.header-subtitle {
-		margin-left: 0.75rem;
-		font-size: 0.85rem;
-		font-weight: 400;
-		color: #999;
-		letter-spacing: 0.02em;
-	}
+  .block-item.menu-toggle:hover {
+    background-color: #555;
+  }
 
-	.nav-buttons {
-		display: flex;
-		align-items: center;
-		gap: 0.4rem;
-	}
+  /* 右侧占位（保持布局） */
+  .header-right {
+    flex: 0 0 auto;
+  }
 
-	.nav-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.4rem 0.6rem;
-		border-radius: 6px;
-		color: #888;
-		text-decoration: none;
-		font-size: 1.1rem;
-		transition: color 0.2s, background 0.2s;
-		cursor: pointer;
-	}
+  /* ---------- 展开面板（右侧滑动/下拉） ---------- */
+  .menu-panel {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    min-width: 200px;
+    background: #ffffff;
+    border: 1px solid #eaeef3;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    padding: 1rem;
+    z-index: 100;
+    display: none; /* 默认隐藏 */
+    transition: opacity 0.2s ease;
+  }
 
-	.nav-btn:hover {
-		color: #3498db;
-		background: #f0f2f4;
-	}
+  .menu-panel.open {
+    display: block;
+  }
 
-	.nav-icon {
-		line-height: 1;
-	}
+  .menu-panel nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
 
-	/* 下拉菜单 */
-	.menu-dropdown,
-	.search-dropdown {
-		position: absolute;
-		top: 100%;
-		right: 0;
-		margin-top: 0.5rem;
-		min-width: 160px;
-		background: #ffffff;
-		border: 1px solid #eaeef3;
-		border-radius: 8px;
-		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-		padding: 0.5rem 0;
-		z-index: 100;
-	}
+  .menu-panel nav a {
+    color: #2c3e50;
+    text-decoration: none;
+    font-size: 0.92rem;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #f0f2f4;
+    transition: color 0.2s;
+  }
 
-	.menu-dropdown a {
-		display: block;
-		padding: 0.5rem 1.2rem;
-		color: #2c3e50;
-		text-decoration: none;
-		font-size: 0.92rem;
-		transition: background 0.2s, color 0.2s;
-	}
+  .menu-panel nav a:hover {
+    color: #3498db;
+  }
 
-	.menu-dropdown a:hover {
-		background: #f0f2f4;
-		color: #3498db;
-	}
+  .menu-panel .search-box {
+    width: 100%;
+  }
 
-	.search-dropdown {
-		min-width: 220px;
-		padding: 0.8rem 1rem;
-	}
+  .menu-panel .search-box input {
+    width: 100%;
+    padding: 0.5rem 0.8rem;
+    border: 1px solid #eaeef3;
+    border-radius: 6px;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
 
-	.search-dropdown input {
-		width: 100%;
-		padding: 0.5rem 0.8rem;
-		border: 1px solid #eaeef3;
-		border-radius: 6px;
-		font-size: 0.92rem;
-		outline: none;
-		transition: border-color 0.2s;
-	}
+  .menu-panel .search-box input:focus {
+    border-color: #3498db;
+  }
 
-	.search-dropdown input:focus {
-		border-color: #3498db;
-	}
-
-	/* 响应式 */
-	@media (max-width: 640px) {
-		.logo {
-			font-size: 1.4rem;
-		}
-		.header-subtitle {
-			font-size: 0.75rem;
-			margin-left: 0.4rem;
-		}
-		.nav-btn {
-			padding: 0.3rem 0.4rem;
-			font-size: 1rem;
-		}
-	}
+  /* 响应式 */
+  @media (max-width: 640px) {
+    .block-item {
+      width: 24px;
+      height: 22px;
+      font-size: 12px;
+    }
+    .block-item.menu-toggle {
+      font-size: 16px;
+    }
+  }
 </style>
+
 <header class="site-header">
-	<div class="container">
-		<div class="header-inner">
-			<!-- ⭐ Story 标题：F I L M s -->
-			<div class="logo">
-				<span class="letter">F</span>
-				<span class="letter">I</span>
-				<a href="/" class="brand-link">
-					<span class="letter brand-letter">L</span>
-				</a>
-				<span class="letter">M</span>
-				<span class="letter">s</span>
-				<span class="header-subtitle">📷 Link's Color.</span>
-			</div>
+  <div class="container">
+    <div class="header-inner">
+      <!-- 方块导航 -->
+      <div class="logo-block">
+        <!-- F -->
+        <span class="block-item">F</span>
+        <!-- I -->
+        <span class="block-item">I</span>
+        <!-- L (链接) -->
+        <a href="/" class="block-item brand-link">L</a>
+        <!-- M -->
+        <span class="block-item">M</span>
+        <!-- s -->
+        <span class="block-item">s</span>
+        <!-- ≡ 汉堡 -->
+        <span class="block-item menu-toggle" id="menuToggle">≡</span>
+      </div>
 
-			<!-- ⭐ 右侧导航按钮 -->
-			<div class="nav-buttons">
-				<a href="javascript:void(0)" id="menuPageBtn" class="nav-btn" title="页面菜单">
-					<span class="nav-icon">≡</span>
-				</a>
-				<a href="javascript:void(0)" id="menuTreeBtn" class="nav-btn" title="目录树">
-					<span class="nav-icon">🌳</span>
-				</a>
-				<a href="javascript:void(0)" id="menuSearchBtn" class="nav-btn" title="搜索">
-					<span class="nav-icon">🔍</span>
-				</a>
-			</div>
-		</div>
+      <!-- 右侧占位（保持原布局） -->
+      <div class="header-right"></div>
+    </div>
 
-		<!-- ⭐ 页面菜单（独立页面列表） -->
-		<div id="menuPage" class="menu-dropdown" style="display:none;">
-			<!-- 由 JS 动态填充，或硬编码 -->
-			<a href="/blog">归档</a>
-			<a href="/about">关于</a>
-			<!-- 更多页面... -->
-		</div>
-
-		<!-- ⭐ 搜索框 -->
-		<div id="menuSearch" class="search-dropdown" style="display:none;">
-			<form action="/search" method="get" role="search">
-				<input type="text" name="q" placeholder="搜索~" autocomplete="off" />
-			</form>
-		</div>
-	</div>
+    <!-- 展开面板（包含导航菜单和搜索） -->
+    <div id="menuPanel" class="menu-panel">
+      <nav>
+        <a href="/blog">归档</a>
+        <a href="/about">关于</a>
+        <!-- 可添加更多页面 -->
+      </nav>
+      <div class="search-box">
+        <form action="/search" method="get" role="search">
+          <input type="text" name="q" placeholder="搜索~" autocomplete="off" />
+        </form>
+      </div>
+    </div>
+  </div>
 </header>
 
-<!-- ⭐ Story 风格交互脚本 -->
 <script is:inline>
-	document.addEventListener('DOMContentLoaded', function() {
-		const menuPageBtn = document.getElementById('menuPageBtn');
-		const menuTreeBtn = document.getElementById('menuTreeBtn');
-		const menuSearchBtn = document.getElementById('menuSearchBtn');
-		const menuPage = document.getElementById('menuPage');
-		const menuSearch = document.getElementById('menuSearch');
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('menuToggle');
+    const panel = document.getElementById('menuPanel');
 
-		// 页面菜单切换
-		menuPageBtn?.addEventListener('click', function(e) {
-			e.preventDefault();
-			menuPage.style.display = menuPage.style.display === 'block' ? 'none' : 'block';
-			menuSearch.style.display = 'none';
-		});
+    if (toggleBtn && panel) {
+      toggleBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        panel.classList.toggle('open');
+      });
 
-		// 目录树按钮（在文章页触发，由 Post.astro 处理）
-		menuTreeBtn?.addEventListener('click', function(e) {
-			e.preventDefault();
-			const tocToggle = document.getElementById('storyTocToggle');
-			if (tocToggle) {
-				tocToggle.click();
-			} else {
-				alert('📑 目录树只在文章页面可用哦');
-			}
-		});
-
-		// 搜索切换
-		menuSearchBtn?.addEventListener('click', function(e) {
-			e.preventDefault();
-			menuSearch.style.display = menuSearch.style.display === 'block' ? 'none' : 'block';
-			menuPage.style.display = 'none';
-			if (menuSearch.style.display === 'block') {
-				menuSearch.querySelector('input')?.focus();
-			}
-		});
-
-		// 点击外部关闭下拉
-		document.addEventListener('click', function(e) {
-			if (!e.target.closest('.nav-buttons') && !e.target.closest('.menu-dropdown') && !e.target.closest('.search-dropdown')) {
-				menuPage.style.display = 'none';
-				menuSearch.style.display = 'none';
-			}
-		});
-	});
+      // 点击面板外部关闭
+      document.addEventListener('click', function (e) {
+        if (
+          !toggleBtn.contains(e.target) &&
+          !panel.contains(e.target)
+        ) {
+          panel.classList.remove('open');
+        }
+      });
+    }
+  });
 </script>

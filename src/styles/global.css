@@ -480,14 +480,9 @@ body::before{ background: url(https://film.969608.xyz/usr/themes/Story/bkg.png) 
 /* ---------- 当前页（高亮） ---------- */
 .page-navigator .current a,
 .page-navigator .current span {
-  background-color: #ff5252cc;  /* 你的主题色 */
-  color: #fff;
+  background-color: ##00000033;  /* 你的主题色 */
+  color: #414141;
   border-radius: 4px;
-}
-/* 当前页 hover 不变（可选） */
-.page-navigator .current a:hover,
-.page-navigator .current span:hover {
-  background-color: #ff5252cc;  /* 或加深一点 */
 }
 
 /* ---------- 上一页/下一页箭头 ---------- */
